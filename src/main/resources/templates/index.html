@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+  <head>
+    <title>Caught up!</title>
+  </head>
+  <body>
+    <div th:if="${param.logout} != null">
+      <p>
+          You have been logged out.
+      </p>
+    </div>
+    <h1 th:inline="text">Welcome to Caught Up, <span th:remove="tag" sec:authentication="name">user</span>!</h1>
+    <div><a th:href="@{/create-account}">Register</a></div>
+    <div><a th:href="@{/logout}">Log out</a></div>
+  </body>
+</html>
