@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+  <head>
+    <title>Post Review | Caught up!</title>
+  </head>
+  <body>
+    <form th:action="@{/post-review}" th:object="${review}" method="POST" enctype="utf8" >
+      <div>
+        <label>What did you think?</label>
+        <div><textarea id="content" name="content" th:field="*{content}" rows="5" cols="32"></textarea></div>
+        <div><input type="checkbox" name="isSpoiler" th:checked="*{isSpoiler}"/><label>Contains spoilers</label></div>
+        <div><input type="submit" value="Post Review"/></div>
+      </div>
+    </form>
+    <div><a th:href="@{/}">Home</a></div>
+  </body>
+</html>

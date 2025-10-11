@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+  <head>
+    <title>Popular reviews | Caught up!</title>
+  </head>
+  <body>
+    <h1>Popular reviews</h1>
+    <section th:each="review : ${reviews}">
+        <article>
+            <div>
+                <span>Watched by </span>
+                <span th:text="${review.author.username}">Author</span>
+                <span th:text="${#temporals.format(review.createdDate, 'dd MMM yyyy')}">Date</span>
+            </div>
+            <!--implement whitespace in css-->
+            <div><p style="white-space: pre-line;" th:utext="${review.content}">Review content</p></div>
+        </article>
+    </section>
+    <div><a th:href="@{/post-review}">Post new review</a></div>
+    <div><a th:href="@{/}">Home</a></div>
+  </body>
+</html>
