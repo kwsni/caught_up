@@ -1,8 +1,11 @@
 package com.kwsni.caught_up.social.model;
 
+import java.util.Set;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.ManyToMany;
 
 @Entity
 public class Member extends UserAccount {
@@ -13,6 +16,9 @@ public class Member extends UserAccount {
     private String website;
     @Enumerated(EnumType.STRING)
     private Pronoun pronoun;
+
+    @ManyToMany(mappedBy = "likes")
+    private Set<Review> likedReviews;
 
     public Member() {
         super();

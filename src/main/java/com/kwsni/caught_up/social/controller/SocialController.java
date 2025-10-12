@@ -7,12 +7,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.context.request.WebRequest;
 
 import com.kwsni.caught_up.social.dto.ReviewDto;
@@ -22,6 +25,7 @@ import com.kwsni.caught_up.social.repository.MemberRepository;
 import com.kwsni.caught_up.social.repository.ReviewRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
+
 
 
 
@@ -62,4 +66,24 @@ public class SocialController {
             reviewRepository.save(newReview);
             return "redirect:/reviews";
     }
+
+    @GetMapping("/reviews/{reviewId}")
+    public String showReview(@PathVariable("reviewId") Long reviewId, Model model) {
+        // handle exception
+        Review review = reviewRepository.findById(reviewId).get();
+        model.addAttribute("review", review);
+        return "review";
+    }
+    
+    @PostMapping("/reviews/{reviewId}/like")
+    public String likeReview(@PathVariable("reviewId") Long reviewId,
+        @RequestHeader(value = HttpHeaders.REFERER, required = false) final String referrer,
+        Principal principal) {
+            Review review = reviewRepository.findById(reviewId).get();
+            Member member = memberRepository.findByUsername(principal.getName());
+            review.getLikes().add(member);
+            reviewRepository.save(review);
+            return "redirect:" + referrer;
+    }
+
 }

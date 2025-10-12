@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+  <head>
+    <title>Review | Caught up!</title>
+  </head>
+  <body>
+    <article th:fragment="review">
+        <div>
+            <span>Watched by </span>
+            <span th:text="${review.author.username}">Author</span>
+            <span th:text="${#temporals.format(review.createdDate, 'dd MMM yyyy')}">Date</span>
+        </div>
+        <!--implement whitespace in css-->
+        <div><p style="white-space: pre-line;" th:utext="${review.content}">Review content</p></div>
+        <div><form th:action="@{/reviews/{id}/like(id=${review.id})}" method="POST"><button type="submit">Like</button> Likes: <span th:text="${review.likes.size()}"/></form></div>
+    </article>
+    <div><a th:href="@{/post-review}">Post new review</a></div>
+    <div><a th:href="@{/}">Home</a></div>
+  </body>
+</html>
