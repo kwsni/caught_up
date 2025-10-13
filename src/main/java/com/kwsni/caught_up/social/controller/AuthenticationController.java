@@ -64,20 +64,20 @@ public class AuthenticationController {
         UserAccount existingEmail = userAccountRepository.findByEmail(registerDto.email());
 
         if(existingUserAccount != null || existingEmail != null ) {
-            return "redirect:/registration?error";
+            return "redirect:/create-account?error";
         }
         
         Pattern p = Pattern.compile("(.+)@(\\S+)");
 
         if(!p.matcher(registerDto.email()).matches()) {
-            return "redirect:/registration?error";
+            return "redirect:/create-account?error";
         }
 
         String password = registerDto.password();
         String confirmPassword = registerDto.confirmPassword();
 
         if(!password.equals(confirmPassword)) {
-            return "redirect:/registration?error";
+            return "redirect:/create-account?error";
         }
 
         String encodedPassword = passwordEncoder.encode(registerDto.password());

@@ -6,7 +6,7 @@
   </head>
   <body>
     <h1>Popular reviews</h1>
-    <section th:each="review : ${reviews}">
+    <section th:fragment="reviews" th:each="review : ${reviews}">
         <div th:insert="(~{review :: review})"></div>
     </section>
     <div><a th:href="@{/post-review}">Post new review</a></div>

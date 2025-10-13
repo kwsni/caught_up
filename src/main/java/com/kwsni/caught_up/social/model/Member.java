@@ -5,7 +5,9 @@ import java.util.Set;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Member extends UserAccount {
@@ -17,8 +19,14 @@ public class Member extends UserAccount {
     @Enumerated(EnumType.STRING)
     private Pronoun pronoun;
 
-    @ManyToMany(mappedBy = "likes")
+    @ManyToMany(mappedBy = "likes", fetch = FetchType.LAZY)
     private Set<Review> likedReviews;
+
+    @OneToMany(mappedBy = "follower", fetch = FetchType.LAZY)
+    private Set<MemberFollow> membersFollowed;
+
+    @OneToMany(mappedBy = "followed", fetch = FetchType.LAZY)
+    private Set<MemberFollow> followingMembers;
 
     public Member() {
         super();
@@ -88,6 +96,30 @@ public class Member extends UserAccount {
 
     public void setPronoun(Pronoun pronoun) {
         this.pronoun = pronoun;
+    }
+
+    public Set<Review> getLikedReviews() {
+        return likedReviews;
+    }
+
+    public void setLikedReviews(Set<Review> likedReviews) {
+        this.likedReviews = likedReviews;
+    }
+
+    public Set<MemberFollow> getMembersFollowed() {
+        return membersFollowed;
+    }
+
+    public void setMembersFollowed(Set<MemberFollow> membersFollowed) {
+        this.membersFollowed = membersFollowed;
+    }
+
+    public Set<MemberFollow> getFollowingMembers() {
+        return followingMembers;
+    }
+
+    public void setFollowingMembers(Set<MemberFollow> followingMembers) {
+        this.followingMembers = followingMembers;
     }
     
 }

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+  <head>
+    <title th:text="|${member.username}'s profile  Caught up!|">Profile | Caught up!</title>
+  </head>
+  <body>
+    <div>
+        <div>Avatar</div>
+        <div>
+            <div>
+                <h1 th:text="${member.username}">Profile</h1>
+                <a th:if="${#authentication.name == member.username}" href="/settings">Edit Profile</a>
+                <form th:unless="${#authentication.name == member.username}" th:action="@{/user/{username}/unfollow(username=${member.username})}" method="POST">
+                    <div><input th:if="${isFollowing}" th:formaction="@{/user/{username}/unfollow(username=${member.username})}" type="submit" value="Unfollow"/></div>
+                    <div><input th:unless="${isFollowing}" th:formaction="@{/user/{username}/follow(username=${member.username})}" type="submit"value="Follow"/></div>
+                    <span th:if="${isFollowed}">Follows you</span>
+                </form>
+            </div>
+            <div><p th:text="${member.bio}">Bio</p></div>
+            <div><span th:text="${member.location}">Location</span></div>
+            <div><span th:text="${member.website}">Website</span></div>
+        </div>
+    </div>
+    <h2>Recent Reviews</h2>
+    <section th:insert="(~{reviews :: reviews})"/>
+    <h2>Popular Reviews</h2>
+    <section th:insert="(~{reviews :: reviews})"/>
+    <div><a href="/">Home</a></div>
+  </body>
+</html>
