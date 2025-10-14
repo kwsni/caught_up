@@ -50,10 +50,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/create-account")
-    public String registerUser(@ModelAttribute UserRegistrationDto registerDto,
-        Errors errors,
-        HttpServletRequest request,
-        Model model) {
+    public String registerUser(@ModelAttribute UserRegistrationDto registerDto) {
         // TODO: Error check, form validation
         // '1. Check for existing username
         // '2. Check if email is valid (regex and check for existing, confirmation later)
