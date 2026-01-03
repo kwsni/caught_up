@@ -2,41 +2,49 @@ package com.kwsni.caught_up.config;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
+import org.springframework.boot.http.client.HttpClientSettings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.http.HttpRequest;
-import org.springframework.http.client.ClientHttpRequestExecution;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
 
 import com.kwsni.caught_up.tvdb.dto.TvdbLoginRequestDto;
 import com.kwsni.caught_up.tvdb.dto.TvdbLoginResponseDto;
-import jakarta.annotation.PostConstruct;
 
 @Configuration
 public class TvdbConfig {
-
-    @Autowired
+    private static final Logger logger = LoggerFactory.getLogger(TvdbConfig.class);
     private RedisTemplate<String, String> redisTemplate;
+
+    TvdbConfig(RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
     @Bean
     RestClient tvdbClient(@Value("${tvdb.api.base_url}") String baseUrl, @Value("${tvdb.api.api_key}") String apiKey) {
         return RestClient.builder()
             .baseUrl(baseUrl)
+            .requestFactory(ClientHttpRequestFactoryBuilder
+                .httpComponents()
+                .build(HttpClientSettings
+                    .defaults()
+                    .withConnectTimeout(Duration.ofMinutes(5))
+                    .withReadTimeout(Duration.ofMinutes(5))
+                )
+            )
             .requestInterceptor((request, body, execution) -> {
                 request.getHeaders().add("Authorization", "Bearer " + getAccessToken(baseUrl, apiKey));
+                logRequest(request, body);
                 return execution.execute(request, body);
             })
             .build();
@@ -60,6 +68,21 @@ public class TvdbConfig {
             return accessToken;
         } else {
             return storedToken;
+        }
+    }
+
+    private void logRequest(HttpRequest request, byte[] body) {
+        logger.debug("Request: {} {}", request.getMethod(), request.getURI());
+        if (body != null && body.length > 0) {
+            logger.debug("Request body: {}", new String(body, StandardCharsets.UTF_8));
+        }
+    }
+
+    private void logResponse(HttpRequest request, ClientHttpResponse response) throws IOException {
+        logger.debug("Response status: {}", response.getStatusCode());
+        byte[] responseBody = response.getBody().readAllBytes();
+        if (responseBody.length > 0) {
+            logger.debug("Response body: {}", new String(responseBody, StandardCharsets.UTF_8));
         }
     }
 }

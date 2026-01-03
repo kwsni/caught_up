@@ -3,19 +3,14 @@ package com.kwsni.caught_up.tvdb.model;
 import java.util.List;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 
 @Entity
 public class Series {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    
-    private Integer tvdbId;
+    private Long tvdbId;
 
     private String name;
     
@@ -30,8 +25,11 @@ public class Series {
     private Double score;
     
     private String image;
+
+    @Lob
+    private String overview;
     
-    @OneToMany
+    @OneToMany(mappedBy = "series")
     private List<Episode> episodes;
     
     private String country;
@@ -40,10 +38,10 @@ public class Series {
 
     private String slug;
 
-    protected Series() {};
+    protected Series() {}
 
-    public Series(Integer tvdbId, String name, String year, String firstAired, String lastAired, String nextAired,
-            Double score, String image, List<Episode> episodes, String country, String lastUpdated, String slug) {
+    public Series(Long tvdbId, String name, String year, String firstAired, String lastAired, String nextAired,
+            Double score, String image, String overview, List<Episode> episodes, String country, String lastUpdated, String slug) {
         this.tvdbId = tvdbId;
         this.name = name;
         this.year = year;
@@ -52,25 +50,34 @@ public class Series {
         this.nextAired = nextAired;
         this.score = score;
         this.image = image;
+        this.overview = overview;
         this.episodes = episodes;
         this.country = country;
         this.lastUpdated = lastUpdated;
         this.slug = slug;
     }
 
-    public Long getId() {
-        return id;
+    public Series(Long tvdbId, String name, String year, String firstAired, String lastAired, String nextAired,
+            Double score, String image, String overview, String country, String lastUpdated, String slug) {
+        this.tvdbId = tvdbId;
+        this.name = name;
+        this.year = year;
+        this.firstAired = firstAired;
+        this.lastAired = lastAired;
+        this.nextAired = nextAired;
+        this.score = score;
+        this.image = image;
+        this.overview = overview;
+        this.country = country;
+        this.lastUpdated = lastUpdated;
+        this.slug = slug;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Integer getTvdbId() {
+    public Long getTvdbId() {
         return tvdbId;
     }
 
-    public void setTvdbId(Integer tvdbId) {
+    public void setTvdbId(Long tvdbId) {
         this.tvdbId = tvdbId;
     }
 
@@ -130,12 +137,24 @@ public class Series {
         this.image = image;
     }
 
+    public String getOverview() {
+        return overview;
+    }
+
+    public void setOverview(String overview) {
+        this.overview = overview;
+    }
+
     public List<Episode> getEpisodes() {
         return episodes;
     }
 
     public void setEpisodes(List<Episode> episodes) {
         this.episodes = episodes;
+    }
+
+    public void addEpisode(Episode episode) {
+        this.episodes.add(episode);
     }
 
     public String getCountry() {

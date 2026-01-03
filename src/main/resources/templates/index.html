@@ -10,10 +10,10 @@
           You have been logged out.
       </p>
     </div>
-    <h1 th:inline="text">Welcome to Caught Up, <span th:remove="tag" sec:authentication="name">user</span>!</h1>
-    <a th:href="@{/reviews}">See Popular Reviews</a>
-    <div sec:authorize="isAuthenticated()"><a th:href="@{/post-review}">Post a Review</a></div>
-    <div sec:authorize="isAnonymous()"><a th:href="@{/create-account}">Register</a></div>
-    <div sec:authorize="isAuthenticated()"><a th:href="@{/logout}">Log out</a></div>
+    <h1 th:inline="text" class="font-bold text-2xl lg:text-6xl">Welcome to Caught Up, <span th:remove="tag" sec:authentication="name">user</span>!</h1>
+    <a th:href="@{/reviews}" class="inline-flex p-3 rounded-lg">See Popular Reviews</a>
+    <div sec:authorize="isAuthenticated()"><a th:href="@{/post-review}" class="inline-flex p-3 rounded-lg">Post a Review</a></div>
+    <div sec:authorize="isAnonymous()"><a th:href="@{/create-account}" class="inline-flex p-3 rounded-lg">Register</a></div>
+    <div sec:authorize="isAuthenticated()"><a th:href="@{/logout}" class="inline-flex p-3 rounded-lg">Log out</a></div>
   </body>
 </html>

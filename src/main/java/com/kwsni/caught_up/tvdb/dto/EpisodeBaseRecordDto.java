@@ -27,7 +27,7 @@ public record EpisodeBaseRecordDto (
     Integer runtime,
     Integer seasonNumber,
     List<SeasonBaseRecordDto> seasons,
-    Long seriesId,
+    Integer seriesId,
     String seasonName,
     String year
 ) {}
