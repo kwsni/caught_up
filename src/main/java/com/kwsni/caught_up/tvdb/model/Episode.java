@@ -5,10 +5,13 @@ import java.io.Serializable;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(indexes = @Index(columnList = "series_tvdb_id, season_number"))
 public class Episode {
     @Id
     private Long tvdbId;

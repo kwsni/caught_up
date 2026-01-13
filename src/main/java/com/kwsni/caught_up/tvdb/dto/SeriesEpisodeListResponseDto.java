@@ -1,14 +1,13 @@
 package com.kwsni.caught_up.tvdb.dto;
 
 import java.net.URL;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.annotation.Nullable;
 
-public record EpisodeListResponseDto(
-    List<EpisodeBaseRecordDto> data,
+public record SeriesEpisodeListResponseDto(
+    SeriesBaseRecordDto data,
     String status,
     Links links
 ) {
@@ -22,6 +21,5 @@ public record EpisodeListResponseDto(
         Integer totalItems,
         @JsonProperty("page_size")
         Integer pageSize
-    ) {}    
+    ) {}
 }
-

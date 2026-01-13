@@ -1,5 +1,7 @@
 package com.kwsni.caught_up.tvdb.batch;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.infrastructure.item.ItemProcessor;
 
 import com.kwsni.caught_up.tvdb.dto.EpisodeBaseRecordDto;
@@ -10,6 +12,7 @@ import jakarta.persistence.EntityManager;
 
 public class EpisodeProcessor implements ItemProcessor<EpisodeBaseRecordDto, Episode> {
     private EntityManager entityManager;
+    private Log logger = LogFactory.getLog(getClass());
 
     public EpisodeProcessor(EntityManager entityManager) {
         this.entityManager = entityManager;
@@ -17,6 +20,10 @@ public class EpisodeProcessor implements ItemProcessor<EpisodeBaseRecordDto, Epi
 
     @Override
     public Episode process(EpisodeBaseRecordDto episodeDto) throws Exception {
+        if(logger.isDebugEnabled()) {
+            logger.debug(String.format("Processing episode from series %d: %d - S%d E%d",
+                episodeDto.seriesId(), episodeDto.id(), episodeDto.seasonNumber(), episodeDto.number()));
+        }
         Episode episode = new Episode(episodeDto.id(),
             episodeDto.name(),
             entityManager.getReference(Series.class,

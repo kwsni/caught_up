@@ -25,9 +25,10 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.client.RestClient;
 
-import com.kwsni.caught_up.tvdb.batch.EpisodePagingItemReader;
+import com.kwsni.caught_up.tvdb.batch.TimestampJobExecutionListener;
 import com.kwsni.caught_up.tvdb.batch.EpisodeProcessor;
 import com.kwsni.caught_up.tvdb.batch.InvalidRecordException;
+import com.kwsni.caught_up.tvdb.batch.SeriesEpisodeItemReader;
 import com.kwsni.caught_up.tvdb.batch.SeriesPagingItemReader;
 import com.kwsni.caught_up.tvdb.batch.SeriesProcessor;
 import com.kwsni.caught_up.tvdb.batch.UpdatePagingItemReader;
@@ -66,13 +67,13 @@ public class TvdbBatchJobConfig {
     @Bean
     @StepScope
     SeriesPagingItemReader seriesReader() {
-        return new SeriesPagingItemReader(tvdbClient, redisTemplate);
+        return new SeriesPagingItemReader(tvdbClient);
     }
 
     @Bean
     @StepScope
-    EpisodePagingItemReader episodeReader() throws Exception {
-        return new EpisodePagingItemReader(dbSeriesReader(), tvdbClient);
+    SeriesEpisodeItemReader episodeReader() throws Exception {
+        return new SeriesEpisodeItemReader(dbSeriesReader(), tvdbClient);
     }
 
     @Bean
@@ -144,11 +145,18 @@ public class TvdbBatchJobConfig {
     }
 
     @Bean
+    TimestampJobExecutionListener timestampJobExecutionListener() {
+        return new TimestampJobExecutionListener(redisTemplate);
+    }
+
+    @Bean
     Job tvdbInitialSyncJob(JobRepository jobRepository,
+        TimestampJobExecutionListener timestampJobExecutionListener,
         Step seriesStep,
         Step episodeStep
     ) {
         return new JobBuilder("tvdbInitialSyncJob", jobRepository)
+            .listener(timestampJobExecutionListener)
             .start(seriesStep)
             .next(episodeStep)
             .build();
@@ -180,7 +188,7 @@ public class TvdbBatchJobConfig {
 
     @Bean
     Step episodeStep(JobRepository jobRepository,
-        EpisodePagingItemReader episodeReader,
+        SeriesEpisodeItemReader episodeReader,
         EpisodeProcessor episodeProcessor,
         RepositoryItemWriter<Episode> episodeWriter
     ) {
@@ -191,9 +199,8 @@ public class TvdbBatchJobConfig {
             .processor(episodeProcessor)
             .writer(episodeWriter)
             .faultTolerant()
-            .skipPolicy((throwable, count) -> 
-                throwable.getClass() == InvalidRecordException.class
-            )
+            .skipPolicy(new LimitCheckingExceptionHierarchySkipPolicy(
+                Set.of(Exception.class), 10))
             .build();
     }
 

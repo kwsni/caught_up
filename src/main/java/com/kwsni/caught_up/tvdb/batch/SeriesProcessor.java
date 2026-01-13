@@ -1,5 +1,7 @@
 package com.kwsni.caught_up.tvdb.batch;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.resilience.annotation.Retryable;
 import org.springframework.web.client.RestClient;
@@ -12,6 +14,7 @@ public class SeriesProcessor implements ItemProcessor<SeriesBaseRecordDto, Serie
     private String apiPath;
     private TransResponseDto seriesTransDto;
     private RestClient tvdbClient;
+    private Log logger = LogFactory.getLog(getClass());
 
     public SeriesProcessor(RestClient tvdbClient) {
         this.tvdbClient = tvdbClient;
@@ -27,6 +30,11 @@ public class SeriesProcessor implements ItemProcessor<SeriesBaseRecordDto, Serie
             apiPath = String.format("/series/%d/translations/eng", seriesDto.id());
             seriesTransDto = fetchResponse();
 
+            if(logger.isDebugEnabled()) {
+                logger.debug(String.format("Processing translated series: %d - %s",
+                    seriesDto.id(), seriesTransDto.data().name()));
+            }
+
             series = new Series(seriesDto.id(),
                 seriesTransDto.data().name(),
                 seriesDto.year(),
@@ -40,6 +48,10 @@ public class SeriesProcessor implements ItemProcessor<SeriesBaseRecordDto, Serie
                 seriesDto.lastUpdated(),
                 seriesDto.slug());
         } else {
+            if(logger.isDebugEnabled()) {
+                logger.debug(String.format("Processing series: %d - %s",
+                    seriesDto.id(), seriesDto.name()));
+            }
             series = new Series(seriesDto.id(),
                 seriesDto.name(),
                 seriesDto.year(),
