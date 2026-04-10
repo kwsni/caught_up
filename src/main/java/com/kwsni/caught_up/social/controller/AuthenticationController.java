@@ -1,40 +1,37 @@
 package com.kwsni.caught_up.social.controller;
 
-import java.util.regex.Pattern;
+import java.security.Principal;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.Errors;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.context.request.WebRequest;
 
+import com.kwsni.caught_up.social.dto.ChangePasswordDto;
+import com.kwsni.caught_up.social.dto.UserProfileDto;
 import com.kwsni.caught_up.social.dto.UserRegistrationDto;
 import com.kwsni.caught_up.social.model.Member;
-import com.kwsni.caught_up.social.model.UserAccount;
 import com.kwsni.caught_up.social.repository.MemberRepository;
-import com.kwsni.caught_up.social.repository.UserAccountRepository;
+import com.kwsni.caught_up.social.service.UserAccountService;
+import com.kwsni.caught_up.social.service.UserAccountService.PasswordNotConfirmedException;
+import com.kwsni.caught_up.social.service.UserAccountService.UserAlreadyExistsException;
 
-import jakarta.servlet.http.HttpServletRequest;
 
 
 @Controller
 public class AuthenticationController {
     @Autowired
-    private UserAccountRepository userAccountRepository;
-    @Autowired
     private MemberRepository memberRepository;
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private UserAccountService userAccountService;
 
     @GetMapping("/create-account")
-    public String showRegistrationForm(WebRequest request, Model model) {
+    public String showRegistrationForm(Model model) {
         UserRegistrationDto registerDto = new UserRegistrationDto(
-            "",
-            "",
             "",
             "",
             "",
@@ -50,45 +47,109 @@ public class AuthenticationController {
     }
 
     @PostMapping("/create-account")
-    public String registerUser(@ModelAttribute UserRegistrationDto registerDto) {
-        // TODO: Error check, form validation
-        // '1. Check for existing username
-        // '2. Check if email is valid (regex and check for existing, confirmation later)
-        // '3. Check if passwords are matching
-        // '4. Persist DTO to entity
-
-        UserAccount existingUserAccount = userAccountRepository.findByUsername(registerDto.username());
-        UserAccount existingEmail = userAccountRepository.findByEmail(registerDto.email());
-
-        if(existingUserAccount != null || existingEmail != null ) {
-            return "redirect:/create-account?error";
+    public String registerUser(
+        @ModelAttribute("user") UserRegistrationDto registerDto,
+        BindingResult bindingResult,
+        Model model
+    ) {
+        if(bindingResult.hasErrors()) {
+            return "registration";
         }
-        
-        Pattern p = Pattern.compile("(.+)@(\\S+)");
+        try {
+            userAccountService.createUser(
+                registerDto.username(),
+                registerDto.email(),
+                registerDto.password(),
+                registerDto.confirmPassword()
+            );
+            return "redirect:/sign-in";
+        } catch(UserAlreadyExistsException e) {
+            bindingResult.rejectValue("username", null, e.getMessage());
+            bindingResult.rejectValue("email", null, e.getMessage());
 
-        if(!p.matcher(registerDto.email()).matches()) {
-            return "redirect:/create-account?error";
+            model.addAttribute("user", registerDto);
+            return "registration";
+        } catch(PasswordNotConfirmedException e) {
+            bindingResult.rejectValue("confirmPassword", "confirm.password.mismatch", e.getMessage());
+
+            model.addAttribute("user", registerDto);
+            return "registration";
         }
-
-        String password = registerDto.password();
-        String confirmPassword = registerDto.confirmPassword();
-
-        if(!password.equals(confirmPassword)) {
-            return "redirect:/create-account?error";
-        }
-
-        String encodedPassword = passwordEncoder.encode(registerDto.password());
-
-        Member newMember = new Member(
-            registerDto.email(),
-            registerDto.firstName(),
-            registerDto.lastName(),
-            registerDto.username(),
-            encodedPassword,
-            "user");
-        memberRepository.save(newMember);
-
-        return "redirect:/sign-in";
     }
     
+    @GetMapping("/settings")
+    public String accountSettings(Model model, Principal principal) {
+        Member profileMember = memberRepository.findByUsername(principal.getName());
+        UserProfileDto profileDto = new UserProfileDto(
+            profileMember.getAvatar(),
+            profileMember.getFirstName(),
+            profileMember.getLastName(),
+            profileMember.getBio(),
+            profileMember.getLocation(),
+            profileMember.getWebsite(),
+            profileMember.getPronoun()
+        );
+
+        model.addAttribute("profileDto", profileDto);
+        return "settings";
+    }
+
+    @PostMapping("/settings")
+    public String changeAccountSettings(
+        @ModelAttribute UserProfileDto profileDto,
+        Principal principal
+    ) {
+        Member profileMember = memberRepository.findByUsername(principal.getName());
+        
+        profileMember.setAvatar(profileDto.avatar());
+        profileMember.setFirstName(profileDto.firstName());
+        profileMember.setLastName(profileDto.lastName());
+        profileMember.setBio(profileDto.bio());
+        profileMember.setLocation(profileDto.location());
+        profileMember.setWebsite(profileDto.website()       .replace("http://", "")
+            .replace("https://", "")
+        );
+
+        memberRepository.save(profileMember);
+        
+        return "redirect:/members/" + principal.getName();
+    }
+    
+    @GetMapping("/settings/password")
+    public String passwordPage(Model model) {
+        ChangePasswordDto passwordDto = new ChangePasswordDto(
+            null,
+            null,
+            null
+        );
+
+        model.addAttribute("passwordDto", passwordDto);
+        return "password";
+    }
+
+    @PostMapping("/settings/password")
+    public String changePassword(
+        @ModelAttribute ChangePasswordDto passwordDto,
+        BindingResult bindingResult,
+        Principal principal
+    ) {
+        if(bindingResult.hasErrors()) {
+            return "password";
+        }
+        try {
+            userAccountService.updatePassword(
+                principal.getName(),
+                passwordDto.currentPassword(),
+                passwordDto.newPassword(),
+                passwordDto.confirmPassword()
+            );
+            return "redirect:/members/" + principal.getName();
+        } catch(PasswordNotConfirmedException e) {
+            bindingResult.rejectValue("confirmPassword", null, e.getMessage());
+            return "password";
+        } catch(BadCredentialsException e) {
+            bindingResult.rejectValue("currentPassword", null, e.getMessage());
+            return "password";
+        }
+    }
 }

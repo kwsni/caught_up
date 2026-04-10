@@ -20,6 +20,7 @@ public record CompanyDto(
     TagOption tagOptions
 ) {
     public record ParentCompany(
+        @Nullable
         Long id,
         String name,
         CompanyRelationShip relation

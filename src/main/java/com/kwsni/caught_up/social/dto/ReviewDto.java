@@ -1,7 +1,20 @@
 package com.kwsni.caught_up.social.dto;
 
-import com.kwsni.caught_up.social.model.Member;
+import java.time.LocalDate;
+import java.util.Set;
 
-public record ReviewDto(Member author, String content, boolean isSpoiler) {
+import com.kwsni.caught_up.social.model.Member;
+import com.kwsni.caught_up.tvdb.model.Series;
+
+public record ReviewDto(
+    Member author,
+    Series series,
+    String content,
+    LocalDate watchedOn,
+    LocalDate createdOn,
+    Double rating,
+    Set<Member> likes,
+    boolean isSpoiler,
+    boolean liked) {
 
 }

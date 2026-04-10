@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+  layout:decorate="~{base}">
+  <head>
+    <title>Browse Series</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <div class="flex flex-col divide-y gap-3 pt-5">
+        <div class="flex flex-row pb-1 justify-between items-end">
+        <h1 class="font-light text-lg text-[#99aabb]">Series</h1>
+          <div class="flex flex-row gap-3 items-end">
+            <div class="block relative group/menu">
+              <button class="block text-nowrap text-light text-sm text-[#667788] cursor-pointer active:text-white group-hover/menu:text-white">
+                Sort by
+              </button>
+              <ul id="menu" class="invisible absolute right-0 z-50 text-[#2c3440] text-xs group-hover/menu:visible">
+                <li><a th:href="@{/series/browse(sort='score,desc', size=${param.size}, page=${param.page})}"
+                  class="block bg-[#8899aa] text-nowrap px-2 py-1 hover:bg-[#708090] hover:text-white active:bg-gray-900">
+                  Popularity
+                </a></li>
+                <li>
+                  <span class="block bg-[#8899aa] text-nowrap px-2 py-1">
+                    Name
+                  </span>
+                  <a th:href="@{/series/browse(sort='name,desc', size=${param.size}, page=${param.page})}"
+                    class="block bg-[#8899aa] text-nowrap pl-6 pr-2 py-1 hover:bg-[#708090] hover:text-white active:bg-gray-900">
+                    Descending
+                  </a>
+                  <a th:href="@{/series/browse(sort='name,asc', size=${param.size}, page=${param.page})}"
+                    class="block bg-[#8899aa] text-nowrap pl-6 pr-2 py-1 hover:bg-[#708090] hover:text-white active:bg-gray-900">
+                    Ascending
+                  </a>
+                </li>
+                <li>
+                  <span class="block bg-[#8899aa] text-nowrap px-2 py-1">
+                    Release Date
+                  </span>
+                  <a th:href="@{/series/browse(sort='firstAired,desc', size=${param.size}, page=${param.page})}"
+                    class="block bg-[#8899aa] text-nowrap pl-6 pr-2 py-1 hover:bg-[#708090] hover:text-white active:bg-gray-900">
+                    Newest First
+                  </a>
+                  <a th:href="@{/series/browse(sort='firstAired,asc', size=${param.size}, page=${param.page})}"
+                    class="block bg-[#8899aa] text-nowrap pl-6 pr-2 py-1 hover:bg-[#708090] hover:text-white active:bg-gray-900">
+                    Earliest First
+                  </a>
+                </li>
+                <li>
+                  <span class="block bg-[#8899aa] text-nowrap px-2 py-1">
+                    Last Air Date
+                  </span>
+                  <a th:href="@{/series/browse(sort='lastAired,desc', size=${param.size}, page=${param.page})}"
+                    class="block bg-[#8899aa] text-nowrap pl-6 pr-2 py-1 hover:bg-[#708090] hover:text-white active:bg-gray-900">
+                    Aired Last
+                  </a>
+                  <a th:href="@{/series/browse(sort='lastAired,asc', size=${param.size}, page=${param.page})}"
+                    class="block bg-[#8899aa] text-nowrap pl-6 pr-2 py-1 hover:bg-[#708090] hover:text-white active:bg-gray-900">
+                    Aired First
+                  </a>
+                </li>
+                <li>
+                  <span class="block bg-[#8899aa] text-nowrap px-2 py-1">
+                    Average Rating
+                  </span>
+                  <a th:href="@{/series/browse(sort='avgRating,desc', size=${param.size}, page=${param.page})}"
+                    class="block bg-[#8899aa] text-nowrap pl-6 pr-2 py-1 hover:bg-[#708090] hover:text-white active:bg-gray-900">
+                    Highest First
+                  </a>
+                  <a th:href="@{/series/browse(sort='avgRating,asc', size=${param.size}, page=${param.page})}"
+                    class="block bg-[#8899aa] text-nowrap pl-6 pr-2 py-1 hover:bg-[#708090] hover:text-white active:bg-gray-900">
+                    Lowest First
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div class="inline-block">
+              <a th:if="${isLarge}" th:href="@{/series/browse(sort=${param.sort}, size=sm, page=${param.page})}" class="align-bottom text-light text-sm text-[#667788] hover:text-[#99aabb]">Resize posters</a>
+              <a th:unless="${isLarge}" th:href="@{/series/browse(sort=${param.sort}, size=lg, page=${param.page})}" class="align-bottom text-light text-sm text-[#667788] hover:text-[#99aabb]">Resize posters</a>
+            </div>
+          </div>
+        </div>
+        <div class="pb-3">
+          <ul class="grid gap-3 grid-cols-4" th:classappend="${isLarge} ? 'lg:grid-cols-6' : 'lg:grid-cols-12'">
+            <li th:each="series : ${seriesList}" class="relative rounded-sm shadow-lg/50">
+              <img th:if="${series.image != null}"th:src="'https://artworks.thetvdb.com' + ${series.image}" class="relative object-contain rounded-sm z-20">
+              <div th:unless="${series.image != null}" class="relative grid rounded-sm z-20 h-full place-items-center text-center bg-[#1f282f]">
+                <span th:text="${series.name}">No image available</span>
+              </div>
+              <a th:href="@{/series/{slug}(slug=${series.slug})}" class="absolute top-0 left-0 right-0 h-full rounded-sm border transition duration-150 hover:border-[#00e054] hover:inset-ring-3 hover:inset-ring-[#00e054] z-30"></a>
+            </li>
+          </ul>
+        </div>
+        <div class="flex flex-row justify-between pb-10 *:only:ml-auto">
+          <a th:if="${hasPrev}" th:href="@{/series/browse(sort=${param.sort}, size=${param.size}, page=${prevPage})}" class="px-4 py-2 rounded-sm bg-[#283038] inset-shadow-[0px_1px_rgba(255,255,255,0.05)] hover:bg-[#303840] hover:text-[#ddeefd]">Previous</a>
+          <a th:if="${hasNext}" th:href="@{/series/browse(sort=${param.sort}, size=${param.size}, page=${nextPage})}" class="px-4 py-2 rounded-sm bg-[#283038] inset-shadow-[0px_1px_rgba(255,255,255,0.05)] hover:bg-[#303840] hover:text-[#ddeefd]">Next</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

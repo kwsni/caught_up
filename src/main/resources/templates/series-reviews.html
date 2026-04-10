@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{base}">
+  <head>
+    <title th:text="|${series.name} (${series.year}) reviews|"></title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <section>
+        <div class="flex flex-col divide-y divide-[#445566] gap-3 pt-5">
+          <div class="flex flex-row pb-1 justify-between items-end">
+            <h1 class="flex flex-col">
+              <span class="font-light">Reviews of</span>
+              <a th:href="@{/series/{slug}(slug=${series.slug})}">
+                <span th:text="${series.name}" class="text-2xl font-serif text-white hover:text-[#40bcf4]">Series</span>
+              </a>
+              <a th:href="@{/series/browse(year=${series.year})}"></a>
+                <span th:text="${series.year}" class="font-light text-lg text-[#99aabb] hover:text-[#40bcf4]">Year</span>
+              </a>      
+            </h1>
+            <div class="flex flex-row gap-3 items-end">
+              <div class="block relative group/menu">
+                <button class="block text-nowrap text-light text-sm text-[#667788] items-center cursor-pointer active:text-white focus:text-white group-hover/menu:text-white">
+                  Rating
+                </button>
+                <ul id="menu" class="invisible absolute right-0 z-50 rounded-sm text-[#2c3440] text-xs group-focus-within/menu:visible group-hover/menu:visible">
+                  <li>
+                    <a th:href="@{/series/{slug}/reviews(sort=${param.sort}, page=${param.page}, slug=${series.slug})}"
+                      class="block bg-[#8899aa] text-nowrap px-2 py-1 hover:bg-[#708090] hover:text-white">
+                      Any rating
+                    </a>
+                  </li>
+                  <li>
+                    <span class="block bg-[#8899aa] text-nowrap px-2 py-1">Rating</span>
+                    <fieldset class="flex flex-row-reverse bg-[#8899aa] px-2 py-1 justify-end items-start text-4xl font-mono">
+                      <a th:href="@{/series/{slug}/reviews(rating=5, sort=${param.sort}, page=${param.page}, slug=${series.slug})}" class="peer size-4 cursor-pointer appearance-none"></a>
+                      <label for="rating5" th:insert="~{fragments/icons :: full-star-ic}" class="pointer-events-none text-[#334455] -ms-2 peer-hover:text-[#40bcf4] *:absolute *:pr-0 *:shrink-0 *:size-4"></label>
+                      <a th:href="@{/series/{slug}/reviews(rating=4.5, sort=${param.sort}, page=${param.page}, slug=${series.slug})}" class="peer w-2 h-4 cursor-pointer appearance-none"></a>
+                      <label for="rating4.5" th:insert="~{fragments/icons :: half-star-ic}" class="pointer-events-none text-[#334455] peer-hover:text-[#40bcf4] *:absolute *:pr-0 *:shrink-0 *:size-4"></label>
+                      <a th:href="@{/series/{slug}/reviews(rating=4, sort=${param.sort}, page=${param.page}, slug=${series.slug})}" class="peer size-4 cursor-pointer appearance-none"></a>
+                      <label for="rating4" th:insert="~{fragments/icons :: full-star-ic}" class="pointer-events-none text-[#334455] -ms-2 peer-hover:text-[#40bcf4] *:absolute *:pr-0 *:shrink-0 *:size-4"></label>
+                      <a th:href="@{/series/{slug}/reviews(rating=3.5, sort=${param.sort}, page=${param.page}, slug=${series.slug})}" class="peer w-2 h-4 cursor-pointer appearance-none"></a>
+                      <label for="rating3.5" th:insert="~{fragments/icons :: half-star-ic}" class="pointer-events-none text-[#334455] peer-hover:text-[#40bcf4] *:absolute *:pr-0 *:shrink-0 *:size-4"></label>
+                      <a th:href="@{/series/{slug}/reviews(rating=3, sort=${param.sort}, page=${param.page}, slug=${series.slug})}" class="peer size-4 cursor-pointer appearance-none"></a>
+                      <label for="rating3" th:insert="~{fragments/icons :: full-star-ic}" class="pointer-events-none text-[#334455] -ms-2 peer-hover:text-[#40bcf4] *:absolute *:pr-0 *:shrink-0 *:size-4"></label>
+                      <a th:href="@{/series/{slug}/reviews(rating=2.5, sort=${param.sort}, page=${param.page}, slug=${series.slug})}" class="peer w-2 h-4 cursor-pointer appearance-none"></a>
+                      <label for="rating2.5" th:insert="~{fragments/icons :: half-star-ic}" class="pointer-events-none text-[#334455] peer-hover:text-[#40bcf4] *:absolute *:pr-0 *:shrink-0 *:size-4"></label>
+                      <a th:href="@{/series/{slug}/reviews(rating=2, sort=${param.sort}, page=${param.page}, slug=${series.slug})}" class="peer size-4 cursor-pointer appearance-none"></a>
+                      <label for="rating2" th:insert="~{fragments/icons :: full-star-ic}" class="pointer-events-none text-[#334455] -ms-2 peer-hover:text-[#40bcf4] *:absolute *:pr-0 *:shrink-0 *:size-4"></label>
+                      <a th:href="@{/series/{slug}/reviews(rating=1.5, sort=${param.sort}, page=${param.page}, slug=${series.slug})}" class="peer w-2 h-4 cursor-pointer appearance-none"></a>
+                      <label for="rating1.5" th:insert="~{fragments/icons :: half-star-ic}" class="pointer-events-none text-[#334455] peer-hover:text-[#40bcf4] *:absolute *:pr-0 *:shrink-0 *:size-4"></label>
+                      <a th:href="@{/series/{slug}/reviews(rating=1, sort=${param.sort}, page=${param.page}, slug=${series.slug})}" class="peer size-4 cursor-pointer appearance-none"></a>
+                      <label for="rating1" th:insert="~{fragments/icons :: full-star-ic}" class="pointer-events-none text-[#334455] -ms-2 peer-hover:text-[#40bcf4] *:absolute *:pr-0 *:shrink-0 *:size-4"></label>
+                      <a th:href="@{/series/{slug}/reviews(rating=0.5, sort=${param.sort}, page=${param.page}, slug=${series.slug})}" class="peer w-2 h-4 cursor-pointer appearance-none"></a>
+                      <label for="rating0.5" th:insert="~{fragments/icons :: half-star-ic}" class="pointer-events-none text-[#334455] peer-hover:text-[#40bcf4] *:absolute *:pr-0 *:shrink-0 *:size-4"></label>
+                    </fieldset>
+                   </li>
+                </ul>
+              </div>
+              <div class="block relative group/menu">
+                <button class="block text-nowrap text-light text-sm text-[#667788] items-center cursor-pointer active:text-white focus:text-white group-hover/menu:text-white">
+                  Sort By
+                </button>
+                <ul id="menu" class="invisible absolute right-0 z-50 rounded-sm text-[#2c3440] text-xs group-focus-within/menu:visible group-hover/menu:visible">
+                  <li>
+                    <span class="block bg-[#8899aa] text-nowrap px-2 py-1">
+                      When Reviewed
+                    </span>
+                    <a th:href="@{/series/{slug}/reviews(sort='createdDate,desc', page=${param.page}, slug=${series.slug})}"
+                      class="block bg-[#8899aa] text-nowrap pl-6 pr-2 py-1 hover:bg-[#708090] hover:text-white active:bg-gray-900">
+                      Newest First
+                    </a>
+                    <a th:href="@{/series/{slug}/reviews(sort='createdDate,asc', page=${param.page}, slug=${series.slug})}"
+                      class="block bg-[#8899aa] text-nowrap pl-6 pr-2 py-1 hover:bg-[#708090] hover:text-white active:bg-gray-900">
+                      Earliest First
+                    </a>
+                  </li>
+                  <li>
+                    <span class="block bg-[#8899aa] text-nowrap px-2 py-1">
+                      Review Rating
+                    </span>
+                    <a th:href="@{/series/{slug}/reviews(sort='rating,desc', page=${param.page}, slug=${series.slug})}"
+                      class="block bg-[#8899aa] text-nowrap pl-6 pr-2 py-1 hover:bg-[#708090] hover:text-white active:bg-gray-900">
+                      Highest First
+                    </a>
+                    <a th:href="@{/series/{slug}/reviews(sort='rating,asc', page=${param.page}, slug=${series.slug})}"
+                      class="block bg-[#8899aa] text-nowrap pl-6 pr-2 py-1 hover:bg-[#708090] hover:text-white active:bg-gray-900">
+                      Lowest First
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-col gap-5 divide-y divide-[#2c3440]">
+            <div th:each="review : ${reviews}" class="pb-5">
+              <article th:replace="~{fragments/list-items :: review (series)}"></article>
+            </div>
+          </div>
+          <div class="flex flex-row justify-between pb-10 *:only:ml-auto">
+            <a th:if="${hasPrev}" th:href="@{/series/{slug}/reviews(sort=${param.sort}, page=${prevPage}, slug=${series.slug})}" class="px-4 py-2 rounded-sm bg-[#283038] inset-shadow-[0px_1px_rgba(255,255,255,0.05)] hover:bg-[#303840] hover:text-[#ddeefd]">Previous</a>
+            <a th:if="${hasNext}" th:href="@{/series/{slug}/reviews(sort=${param.sort}, page=${nextPage}, slug=${series.slug})}" class="px-4 py-2 rounded-sm bg-[#283038] inset-shadow-[0px_1px_rgba(255,255,255,0.05)] hover:bg-[#303840] hover:text-[#ddeefd]">Next</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

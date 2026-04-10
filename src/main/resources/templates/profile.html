@@ -1,31 +1,101 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
-  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{base}">
   <head>
-    <title th:text="|${member.username}'s profile  Caught up!|">Profile | Caught up!</title>
+    <title th:text="${member.username + ' profile'}">Profile</title>
   </head>
   <body>
-    <div>
-        <div>Avatar</div>
-        <div>
-            <div>
-                <h1 th:text="${member.username}">Profile</h1>
-                <a th:if="${#authentication.name == member.username}" href="/settings">Edit Profile</a>
-                <form th:unless="${#authentication.name == member.username}" th:action="@{/user/{username}/unfollow(username=${member.username})}" method="POST">
-                    <div><input th:if="${isFollowing}" th:formaction="@{/user/{username}/unfollow(username=${member.username})}" type="submit" value="Unfollow"/></div>
-                    <div><input th:unless="${isFollowing}" th:formaction="@{/user/{username}/follow(username=${member.username})}" type="submit"value="Follow"/></div>
-                    <span th:if="${isFollowed}">Follows you</span>
+    <div layout:fragment="content">
+      <div class="flex flex-col my-5">
+        <div class="flex flex-row justify-between">
+          <div class="flex flex-row gap-5">
+            <img th:if="${member.avatar != null}" class="w-24 h-24 rounded-full" th:href="${member.avatar}">
+            <div th:unless="${member.avatar != null}" class="w-24 h-24 bg-[#667788] rounded-full"></div>
+            <div class="flex flex-col justify-center gap-2">
+              <div class="flex flex-row gap-5">
+                <h1 th:text="${member.username}" class="text-xl font-bold text-white">Profile</h1>
+                <a sec:authorize="isAuthenticated()" th:if="${#authentication.name == member.username}" th:href="@{/settings}" class="px-2 py-1 rounded-sm text-sm font-mono font-bold bg-[#556677] text-[#c8d4e0] inset-shadow-2xs/30 inset-shadow-white hover:text-white hover:bg-[#667788]">EDIT PROFILE</a>
+                <form sec:authorize="isAuthenticated()" th:unless="${#authentication.name == member.username}" th:action="@{/members/{username}/unfollow(username=${member.username})}" method="POST" class="flex flex-row gap-3">
+                  <div><input th:if="${isFollowing}" th:formaction="@{/members/{username}/unfollow(username=${member.username})}" type="submit" value="UNFOLLOW" class="px-2 py-1 rounded-sm text-sm font-mono font-bold bg-[#556677] text-[#c8d4e0] inset-shadow-2xs/30 inset-shadow-white hover:text-white hover:bg-[#667788]"/></div>
+                  <div><input th:unless="${isFollowing}" th:formaction="@{/members/{username}/follow(username=${member.username})}" type="submit"value="FOLLOW" class="px-2 py-1 rounded-sm text-sm font-mono font-bold bg-[#556677] text-[#c8d4e0] inset-shadow-2xs/30 inset-shadow-white hover:text-white hover:bg-[#667788]"/></div>
+                  <span th:if="${isFollowed}">Follows you</span>
                 </form>
+              </div>
+              <div th:if="${not #strings.isEmpty(member.bio) and #strings.length(member.bio) le 100}" class="flex flex-col divide-y divide-[#445566] gap-3 text-sm text-[#99aabb]">
+                <p th:text="${member.bio}">Bio content</p>
+              </div>
+              <div class="flex flex-row gap-5 text-sm text-[#99aabb]">
+                <div th:if="${not #strings.isEmpty(member.location)}" class="flex flex-row gap-1">
+                  <span class="flex flex-row items-center *:inline *:size-4">
+                    <svg th:replace="~{fragments/icons :: map-pin-ic}"></svg>
+                  </span>
+                  <span th:text="${member.location}">Location</span>
+                </div>
+                <a th:if="${not #strings.isEmpty(member.website)}" th:href="@{|http://${member.website}|}" class="flex flex-row gap-1">
+                  <span class="flex flex-row items-center *:inline *:size-4">
+                    <svg th:replace="~{fragments/icons :: globe-ic}"></svg>
+                  </span>
+                  <span th:text="${member.website}">Website</span>
+                </a>
+              </div>
             </div>
-            <div><p th:text="${member.bio}">Bio</p></div>
-            <div><span th:text="${member.location}">Location</span></div>
-            <div><span th:text="${member.website}">Website</span></div>
+          </div>
+          <div class="flex flex-row divide-x items-center divide-[#24303c]">
+            <div class="flex flex-col px-2 justify-center items-center">
+              <span th:text="${#sets.size(member.reviews)}" class="text-xl font-bold font-serif">Reviews</span>
+              <span class="text-sm font-light">Reviews</span>
+            </div>
+            <div class="flex flex-col px-2 justify-center items-center">
+              <span th:text="${#sets.size(member.membersFollowed)}" class="text-xl font-bold font-serif">Following</span>
+              <span class="text-sm font-light">Following</span>
+            </div>
+            <div class="flex flex-col px-2 justify-center items-center">
+              <span th:text="${#sets.size(member.followingMembers)}" class="text-xl font-bold font-serif">Followers</span>
+              <span class="text-sm font-light">Followers</span>
+            </div>
+          </div>
         </div>
+        <div class="grid grid-cols-[630px_250px] gap-[70px]">
+          <div class="flex flex-col">
+            <section>
+              <div th:if="${recentReviews.hasContent()}" class="flex flex-col divide-y divide-[#445566] gap-3 pt-5">
+                <div class="flex flex-row py-1 justify-between items-end">
+                  <h1 class="font-light text-lg text-[#99aabb]">Recent Reviews</h1>
+                  <a th:href="@{/members/{username}/reviews(username=${member.username}, sort='createdDate,desc')}" class="text-light text-sm text-[#667788] hover:text-[#40bcf4]">More</a>
+                </div>
+                <div th:fragment="reviews" class="flex flex-col gap-5 divide-y divide-[#2c3440]">
+                  <div th:each="review : ${recentReviews}" class="pb-5">
+                    <article th:replace="~{fragments/list-items :: review ('member')}"></article>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section>
+              <div th:if="${popularReviews.hasContent()}" class="flex flex-col divide-y divide-[#445566] gap-3 pt-5">
+                <div class="flex flex-row py-1 justify-between items-end">
+                  <h1 class="font-light text-lg text-[#99aabb]">Popular Reviews</h1>
+                  <a th:href="@{/members/{username}/reviews(username=${member.username}, sort='id,desc')}" class="text-light text-sm text-[#667788] hover:text-[#40bcf4]">More</a>
+                </div>
+                <div class="flex flex-col gap-5 divide-y divide-[#2c3440]">
+                  <div th:each="review : ${popularReviews}" class="pb-5">
+                    <article th:replace="~{fragments/list-items :: review ('member')}"></article>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+          <div class="flex flex-col">
+            <div th:if="${not #strings.isEmpty(member.bio) and #strings.length(member.bio) > 100}" class="flex flex-col divide-y divide-[#445566] gap-3 pt-5">
+              <div class="flex flex-row py-1 justify-between items-end">
+                <h1 class="font-light text-lg text-[#99aabb]">Bio</h1>
+              </div>
+              <p th:text="${member.bio}">Bio content</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <h2>Recent Reviews</h2>
-    <section th:insert="(~{reviews :: reviews})"/>
-    <h2>Popular Reviews</h2>
-    <section th:insert="(~{reviews :: reviews})"/>
-    <div><a href="/">Home</a></div>
   </body>
 </html>

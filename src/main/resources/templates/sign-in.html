@@ -1,21 +1,42 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
-  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+  layout:decorate="~{base}">
   <head>
-    <title>Sign In | Caught Up!</title>
+    <title>Sign In</title>
   </head>
   <body>
-    <div th:if="${param.error}">
-      Invalid username and password.
+    <div layout:fragment="content">
+      <div class="flex flex-col items-center">
+        <div class="flex flex-col pt-5 mt-10 rounded-lg bg-[#445566]">
+          <div class="grid p-5 gap-5">
+            <h1 class="w-full text-3xl text-white font-bold text-center">Sign in to Caught Up!</h1>
+            <p class="w-full text-center">
+              <span>If you're new to Caught Up...</span>
+              <a th:href="@{/create-account}" class="py-1 px-3 rounded-full text-[#ddeeff] bg-[#667788] transition duration-150 hover:text-white hover:bg-[#778899]">Register</a>
+            </p>
+          </div>
+          <form th:action="@{/sign-in}" method="post">
+            <div class="flex flex-col p-5 gap-5">
+              <p th:if="${param.error}" class="text-[#ee7000]">
+                Invalid username or password.
+              </p>
+              <p th:if="${param.logout}" class="text-[#ee7000]">
+                You have been logged out.
+              </p>
+              <div class="flex flex-col">
+                <label for="username" th:classappend="${param.error} ? 'text-[#ee7000]' : ''">Username</label>
+                <input id="username" name="username" type="text" required th:classappend="${param.error} ? 'border-[#ee7000]' : ''" class="border rounded-sm p-1 text-[#556677] bg-[#ccddee] focus:bg-white focus:text-[#223344]"/>
+              </div>
+              <div class="flex flex-col">
+                <label for="password" th:classappend="${param.error} ? 'text-[#ee7000]' : ''">Password</label>
+                <input id="password" name="password" type="password" th:classappend="${param.error} ? 'border-[#ee7000]' : ''" required class="border rounded-sm p-1 text-[#556677] bg-[#ccddee] focus:bg-white focus:text-[#223344]"/>
+              </div>
+            </div>
+            <input type="submit" value="SIGN IN" class="w-full p-2 font-mono font-bold rounded-b-lg cursor-pointer transition duration-150 bg-[#00ac1c] hover:bg-[#009d1a] text-white inset-shadow-2xs/30 inset-shadow-white"/>
+          </form>
+        </div>
+      </div>
     </div>
-    <div th:if="${param.logout}">
-      You have been logged out.
-    </div>
-    <form th:action="@{/sign-in}" method="post">
-      <div><label> Username: <input type="text" name="username"/> </label></div>
-      <div><label> Password: <input type="password" name="password"/> </label></div>
-      <div><input type="submit" value="Sign In"/></div>
-      <div><a th:href="@{/create-account}">Register</a></div>
-    </form>
   </body>
 </html>

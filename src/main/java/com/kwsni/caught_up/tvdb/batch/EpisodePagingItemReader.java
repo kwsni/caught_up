@@ -15,7 +15,7 @@ public class EpisodePagingItemReader extends AbstractPagingItemReader<EpisodeBas
         private RestClient tvdbClient;
 
         public EpisodePagingItemReader(RestClient tvdbClient, Integer seriesId) {
-            this.apiPath = String.format("/series/%d/episodes/default/eng", seriesId);
+            this.apiPath = "/series/" + seriesId + "/episodes/default/eng";
             this.tvdbClient = tvdbClient;
             this.nextPage = 0;
             setPageSize(500);
@@ -32,7 +32,7 @@ public class EpisodePagingItemReader extends AbstractPagingItemReader<EpisodeBas
             SeriesEpisodeListResponseDto episodeResponse;
             List<EpisodeBaseRecordDto> responseData;
             if(logger.isDebugEnabled()) {
-                logger.debug(String.format("episodeReader calling fetchResponse() at path %s", apiPath));
+                logger.debug("episodeReader calling fetchResponse() at path " + apiPath);
             }
             episodeResponse = fetchResponse();
             responseData = episodeResponse.data().episodes();

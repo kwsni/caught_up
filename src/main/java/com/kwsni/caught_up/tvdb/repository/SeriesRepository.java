@@ -8,6 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kwsni.caught_up.tvdb.model.Series;
 
 @Transactional
-public interface SeriesRepository extends JpaRepository<Series, Integer> {
+public interface SeriesRepository extends JpaRepository<Series, Long> {
     public Optional<Series> findBySlug(String slug);
 }

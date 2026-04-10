@@ -2,6 +2,8 @@ package com.kwsni.caught_up.social.model;
 
 import java.util.Set;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -13,11 +15,16 @@ import jakarta.persistence.OneToMany;
 public class Member extends UserAccount {
     private String firstName;
     private String lastName;
+    @ColumnDefault("\'https://cdn.discordapp.com/embed/avatars/1.png\'")
+    private String avatar;
     private String bio;
     private String location;
     private String website;
     @Enumerated(EnumType.STRING)
     private Pronoun pronoun;
+
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
+    private Set<Review> reviews;
 
     @ManyToMany(mappedBy = "likes", fetch = FetchType.LAZY)
     private Set<Review> likedReviews;
@@ -32,12 +39,10 @@ public class Member extends UserAccount {
         super();
     }
 
-    public Member(String email, String firstName, String lastName, String username, String password, String role) {
+    public Member(String email, String username, String password, String role) {
         super(email, username, password, role);
-
-        this.firstName = firstName;
-        this.lastName = lastName;
     }
+    
 
     public String getFirstName() {
         return firstName;
@@ -53,6 +58,13 @@ public class Member extends UserAccount {
         return lastName;
     }
 
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
@@ -98,6 +110,14 @@ public class Member extends UserAccount {
         this.pronoun = pronoun;
     }
 
+    public Set<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(Set<Review> reviews) {
+        this.reviews = reviews;
+    }
+
     public Set<Review> getLikedReviews() {
         return likedReviews;
     }
@@ -122,4 +142,7 @@ public class Member extends UserAccount {
         this.followingMembers = followingMembers;
     }
     
+    public int getReviewCount() {
+        return reviews != null ? reviews.size() : 0;
+    }
 }

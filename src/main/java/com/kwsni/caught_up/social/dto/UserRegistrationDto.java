@@ -1,10 +1,16 @@
 package com.kwsni.caught_up.social.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public record UserRegistrationDto (
-     String firstName,
-     String lastName,
+     @Email
+     @NotBlank
      String email,
+     @NotBlank
      String username,
+     @NotBlank
      String password,
+     @NotBlank
      String confirmPassword
 ) {}

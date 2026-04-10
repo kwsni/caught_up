@@ -27,12 +27,11 @@ public class SeriesProcessor implements ItemProcessor<SeriesBaseRecordDto, Serie
             (seriesDto.nameTranslations().contains("eng") ||
             seriesDto.overviewTranslations().contains("eng"))
         ) {
-            apiPath = String.format("/series/%d/translations/eng", seriesDto.id());
+            apiPath = "/series/" + seriesDto.id() + "/translations/eng";
             seriesTransDto = fetchResponse();
 
             if(logger.isDebugEnabled()) {
-                logger.debug(String.format("Processing translated series: %d - %s",
-                    seriesDto.id(), seriesTransDto.data().name()));
+                logger.debug("Processing translated series: " + seriesDto.id() + " - " + seriesTransDto.data().name());
             }
 
             series = new Series(seriesDto.id(),
@@ -49,8 +48,7 @@ public class SeriesProcessor implements ItemProcessor<SeriesBaseRecordDto, Serie
                 seriesDto.slug());
         } else {
             if(logger.isDebugEnabled()) {
-                logger.debug(String.format("Processing series: %d - %s",
-                    seriesDto.id(), seriesDto.name()));
+                logger.debug("Processing series: " + seriesDto.id() + " - " + seriesDto.name());
             }
             series = new Series(seriesDto.id(),
                 seriesDto.name(),

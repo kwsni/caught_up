@@ -1,21 +1,44 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
-  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+  layout:decorate="~{base}">
   <head>
-    <title>Review | Caught up!</title>
+    <title th:text="|${review.author.username}'s review of ${review.series.name} (${review.series.year})|">Review</title>
   </head>
   <body>
-    <article th:fragment="review">
-        <div>
-            <span>Watched by </span>
-            <span th:text="${review.author.username}">Author</span>
-            <span th:text="${#temporals.format(review.createdDate, 'dd MMM yyyy')}">Date</span>
+    <div layout:fragment="content">
+      <div class="flex flex-col my-10">
+        <div class="flex flex-row gap-5">
+          <a th:href="@{/series/{slug}(slug=${review.series.slug})}" class="shrink-0">
+            <img th:if="${review.series.image != null}" th:src="'https://artworks.thetvdb.com' + ${review.series.image}" class="sticky top-3 w-[230px] h-[338px] object-contain rounded-sm border shadow-lg/50">
+            <div th:unless="${review.series.image != null}" class="w-[230px] h-[338px] bg-[#1f282f] rounded-sm border shadow-lg/50"></div>
+          </a>
+          <article th:replace="~{fragments/list-items :: review ('review-solo')}"></article>
         </div>
-        <!--implement whitespace in css-->
-        <div><p style="white-space: pre-line;" th:utext="${review.content}">Review content</p></div>
-        <div><form th:action="@{/reviews/{id}/like(id=${review.id})}" method="POST"><button type="submit">Like</button> Likes: <span th:text="${review.likes.size()}"/></form></div>
-    </article>
-    <div><a th:href="@{/post-review}">Post new review</a></div>
-    <div><a th:href="@{/}">Home</a></div>
+        <div id="comments" class="flex flex-col w-[720px] divide-y divide-[#445566] pt-5">
+          <h2 class="font-light text-lg text-[#99aabb]" th:text="${#lists.isEmpty(review.comments)} ? 'Comments?' : ${review.comments.size()} + ' comments'">Comments</h2>
+          <div class="flex flex-col divide-y divide-[#2c3440]">
+            <div th:each="comment : ${review.comments}" class="grid grid-cols-[250px_470px] py-4">
+              <div class="flex flex-row gap-2 pb-5">
+                <a th:href="@{/members/{username}(username=${comment.author.username})}">
+                  <img th:if="${comment.author.avatar != null}" class="w-6 h-6 rounded-full" th:href="${comment.author.avatar}">
+                  <div th:if="${comment.author.avatar == null}" class="w-6 h-6 bg-[#1f282f] rounded-full"></div>
+                </a>
+                <a th:href="@{/members/{username}(username=${comment.author.username})}" class="text-sm font-bold text-[#99aabb]" th:text="${comment.author.username}">Username</a>
+              </div>
+              <p th:utext="${comment.content}" class="text-sm">Comment content</p>
+            </div>
+          </div>
+          <form action="#" th:action="@{/reviews/{reviewId}(reviewId=${review.id})}" th:object="${postComment}" sec:authorize="isAuthenticated()" method="POST" enctype="utf8" class="ml-[250px] pt-5">
+            <textarea id="content" name="content" th:field="*{content}" required th:placeholder="|Reply as ${#authentication.name}|" class="w-full min-h-32 p-4 rounded-sm bg-[#2c3440] text-[#8899aa] focus:bg-white focus:text-[#223344] focus:outline-none"></textarea>
+            <input type="submit" value="POST" class="mt-5 bg-[#00ac1c] hover:bg-[#009d1a] active:bg-[#009318] text-white font-mono font-semibold align-center px-3 py-1 rounded-sm inset-shadow-2xs/30 inset-shadow-white"/>
+          </form>
+          <span sec:authorize="isAnonymous()" class="text-sm pt-5">
+            Please
+            <a th:href="@{/sign-in}" class="text-[#ddeeff] hover:text-[#40bcf4] active:text-[#209ce4]">sign in</a>
+            to reply
+        </div>
+      </div>
+    </div>
   </body>
 </html>

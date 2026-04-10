@@ -1,6 +1,6 @@
 package com.kwsni.caught_up.social.model;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -26,7 +26,7 @@ public class MemberFollow {
     Member followed;
 
     @CreationTimestamp
-    LocalDateTime followDate;
+    OffsetDateTime followDate;
 
     protected MemberFollow() {}
 
@@ -91,11 +91,11 @@ public class MemberFollow {
         this.followed = followed;
     }
 
-    public LocalDateTime getFollowDate() {
+    public OffsetDateTime getFollowDate() {
         return followDate;
     }
 
-    public void setFollowDate(LocalDateTime followDate) {
+    public void setFollowDate(OffsetDateTime followDate) {
         this.followDate = followDate;
     }
     

@@ -57,6 +57,19 @@ public class UserAccount implements UserDetails, CredentialsContainer {
         this.password = null;
     }
     
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof UserAccount user) {
+            return this.username.equals(user.getUsername());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.username.hashCode();
+    }
+    
     public Long getId() {
         return id;
     }

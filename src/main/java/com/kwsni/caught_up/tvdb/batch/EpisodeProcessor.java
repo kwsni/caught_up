@@ -21,8 +21,8 @@ public class EpisodeProcessor implements ItemProcessor<EpisodeBaseRecordDto, Epi
     @Override
     public Episode process(EpisodeBaseRecordDto episodeDto) throws Exception {
         if(logger.isDebugEnabled()) {
-            logger.debug(String.format("Processing episode from series %d: %d - S%d E%d",
-                episodeDto.seriesId(), episodeDto.id(), episodeDto.seasonNumber(), episodeDto.number()));
+            logger.debug("Processing episode from series " + episodeDto.seriesId() + ": " + episodeDto.id() + " - S" + episodeDto.seasonNumber() + " E" + episodeDto.number());
+            logger.debug(episodeDto);
         }
         Episode episode = new Episode(episodeDto.id(),
             episodeDto.name(),

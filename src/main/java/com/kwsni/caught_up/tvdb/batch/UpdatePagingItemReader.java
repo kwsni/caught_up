@@ -13,9 +13,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.client.RestClient;
 
 import com.kwsni.caught_up.tvdb.dto.UpdateResponseDto;
-import com.kwsni.caught_up.tvdb.dto.UpdateResponseDto.Update;
+import com.kwsni.caught_up.tvdb.dto.UpdateResponseDto.UpdateDto;
 
-public class UpdatePagingItemReader extends AbstractPagingItemReader<Update> {
+public class UpdatePagingItemReader extends AbstractPagingItemReader<UpdateDto> {
     private final String apiPath;
     private int nextPage;
     private RestClient tvdbClient;
@@ -43,7 +43,7 @@ public class UpdatePagingItemReader extends AbstractPagingItemReader<Update> {
         }
 
         UpdateResponseDto updateResponse;
-        List<Update> responseData;
+        List<UpdateDto> responseData;
         updateResponse = fetchResponse();
         responseData = updateResponse.data();
         
@@ -64,12 +64,13 @@ public class UpdatePagingItemReader extends AbstractPagingItemReader<Update> {
             .body(UpdateResponseDto.class);
     }
 
+    // Move to AfterJob?
     @AfterStep
     ExitStatus setLastUpdate(StepExecution stepExecution) {
         String exitCode = stepExecution.getExitStatus().getExitCode();
         if(exitCode.equals(ExitStatus.COMPLETED.getExitCode())) {
             String lastUpdated = String.valueOf(stepExecution.getExecutionContext().get("lastUpdated", Long.class));
-            logger.debug(String.format("ctx lastupdated: %s", lastUpdated));
+            logger.debug("ctx lastupdated: " + lastUpdated);
             redisTemplate.opsForValue().set(
                 "lastUpdated",
                 lastUpdated);

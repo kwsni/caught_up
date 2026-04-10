@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.0</version>
+		<version>4.0.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.kwsni</groupId>
 	<artifactId>caught_up</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>caught_up</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Social website for TV series logging and reviews</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -28,8 +28,13 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
+		<groovy.version>5.0.3</groovy.version>
 	</properties>
 	<dependencies>
+		<dependency>
+			<groupId>nz.net.ultraq.thymeleaf</groupId>
+			<artifactId>thymeleaf-layout-dialect</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-batch</artifactId>
@@ -148,8 +153,15 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<mainClass>com.kwsni.caught_up.TvdbInitialSyncApplication</mainClass>
+					<mainClass>com.kwsni.caught_up.CaughtUpApplication</mainClass>
 				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

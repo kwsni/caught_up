@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+  layout:decorate="~{base}">
+  <head>
+    <title th:text="${series.name + ' (' + series.year + ')' }">Series</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <div class="flex flex-col my-10">
+        <div class="flex flex-row gap-5">
+          <img th:if="${series.image != null}" th:src="'https://artworks.thetvdb.com' + ${series.image}" class="sticky top-3 w-[230px] h-[338px] object-contain rounded-sm border shadow-lg/50">
+          <div th:unless="${series.image != null}" class="w-[230px] h-[338px] bg-[#1f282f] rounded-sm border shadow-lg/50"></div>
+          <article class="flex flex-col">
+            <section class="flex flex-row items-end gap-3 mb-5">
+              <h1 th:text="${series.name}" class="text-4xl text-white font-bold font-serif">Name</h1> 
+              <h2 th:text="${series.year}" class="text-[#ddeeff] font-light underline decoration-[#575e68]">Year</h2>
+            </section>
+            <section class="flex flex-row mb-5">
+              <p style="white-space: pre-line;" th:utext="${series.overview}" class="font-serif">Overview</p>
+              <div class="ml-3">
+                <form sec:authorize="isAuthenticated()" th:replace="~{post-review :: post-review}"></form>
+                <div th:if="${reviews.hasContent()}" class="flex flex-col divide-y divide-[#445566] gap-3 pt-5">
+                  <h1 class="font-light text-lg text-[#99aabb] text-nowrap">Average rating</h1>
+                  <div class="flex flex-row py-1 gap-3">
+                    <span class="flex flex-row items-center text-[#00c030] *:w-4 *:h-4">
+                      <th:block th:each="i : ${#numbers.sequence(1, avgRating.intValue())}">
+                        <svg th:replace="~{fragments/icons :: full-star-ic}"></svg>
+                      </th:block>
+                      <span th:if="${avgRating % 1 != 0}" class="self-start">½</span>
+                    </span>
+                    <h2 class="text-2xl" th:text="${#numbers.formatDecimal(avgRating, 0, 2)}"></h2>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section class="flex flex-col gap-5 mb-5">
+              <details th:each="season : ${episodesBySeason.entrySet()}" class="rounded-lg border bg-[#202830] p-2">
+                <summary class="flex flex-row justify-between cursor-pointer">
+                  <h2 th:text="'Season ' + ${season.getKey()}" class="text-2xl"></h2>
+                </summary>
+                <ol class="divide-y">
+                  <li th:each="episode : ${season.getValue()}" class="flex flex-row justify-between">
+                    <div>
+                      <span th:text="'S' + ${season.getKey()} + 'E' + ${episode.getNumber}"></span>
+                      <span th:text="${episode.getName}"></span>
+                    </div>
+                    <span th:text="${episode.getAired}"></span>
+                  </li>
+                </ol>
+              </details>
+            </section>
+            <section>
+              <div th:if="${reviews.hasContent()}" class="flex flex-col divide-y divide-[#445566] gap-3 pt-5">
+                <div class="flex flex-row py-1 justify-between items-end">
+                  <h1 class="font-light text-lg text-[#99aabb]">Popular Reviews</h1>
+                  <a th:href="@{/series/{slug}/reviews(slug=${series.slug})}" class="text-light text-sm text-[#667788] hover:text-[#40bcf4]">Browse</a>
+                </div>
+                <div class="flex flex-col gap-5 divide-y divide-[#2c3440]">
+                  <div th:each="review : ${reviews}" class="pb-5">
+                    <article th:replace="~{fragments/list-items :: review ('series')}"></article>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </article>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

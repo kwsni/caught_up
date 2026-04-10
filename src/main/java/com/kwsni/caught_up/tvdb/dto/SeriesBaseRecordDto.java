@@ -29,6 +29,15 @@ public record SeriesBaseRecordDto(
     Status status,
     String year
 ) {
+    public SeriesBaseRecordDto {
+        if(overview != null && overview.contains("\u0000")) {
+            overview = overview.replace("\u0000", "");
+        }
+        if(image != null && image.contains("https://artworks.thetvdb.com")) {
+            image = image.replace("https://artworks.thetvdb.com", "");
+        }
+    }
+
     public record Status(
         Long id,
         Boolean keepUpdated,

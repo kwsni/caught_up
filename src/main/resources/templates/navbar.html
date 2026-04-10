@@ -1,0 +1,37 @@
+<nav th:fragment="navbar" class="w-full py-4 px-2 mx-auto lg:w-[950px]  text-[#aabbcc]">
+    <ul class="flex flex-row w-full justify-between items-center gap-3">
+        <li><a th:href="@{/}" class="text-left text-2xl text-nowrap font-mono lg:text-4xl">Caught Up!</a></li>
+        <ul class="flex flex-row items-center gap-3 font-mono font-bold">
+            <ul class="flex flex-row items-center">
+                <li sec:authorize="isAuthenticated()" class="inline-block relative group/menu">
+                    <button class="flex flex-row items-center gap-2 cursor-pointer">
+                        <img th:src="${#authentication.principal.avatar}"
+                            class="rounded-full h-10"/>
+                        <span th:text="${#strings.toUpperCase(#authentication.principal.username)}" class="text-nowrap font-bold">
+                            Username
+                        </span>
+                    </button>
+                    <div id="menu" class="invisible absolute right-0 z-3 outline-1 divide-y outline-[#667788] divide-[#667788] font-sans font-normal group-focus-within/menu:visible group-hover/menu:visible">
+                        <a th:href="@{/members/{username}(username=${#authentication.principal.username})}"
+                            class="block bg-[#8899aa] text-[#2c3440] text-nowrap px-4 py-2 hover:bg-[#667788] hover:text-white active:bg-[#607080]">
+                            Profile
+                        </a>
+                        <a th:href="@{/members/{username}/reviews(username=${#authentication.principal.username})}"
+                            class="block bg-[#8899aa] text-[#2c3440] text-nowrap px-4 py-2 hover:bg-[#667788] hover:text-white active:bg-[#607080]">
+                            Reviews
+                        </a>
+                        <a th:href="@{/logout}"
+                            class="block bg-[#8899aa] text-[#2c3440] text-nowrap px-4 py-2 hover:bg-[#667788] hover:text-white active:bg-[#607080]">
+                            Log out
+                        </a>
+                    </div>
+                </li>
+                <li sec:authorize="isAnonymous()"><a th:href="@{/sign-in}" class="text-nowrap hover:text-white">SIGN IN</a></li>
+            </ul>
+            <li><a th:href="@{/series}" class="hover:text-white">SERIES</a></li>
+            <li><a th:href="@{/reviews}" class="hover:text-white">REVIEWS</a></li>
+            <li><a th:href="@{/members}" class="hover:text-white">MEMBERS</a></li>
+            <li sec:authorize="isAuthenticated()"><a th:href="@{/post-review}" class="bg-[#00ac1c] hover:bg-[#009d1a] text-white align-center px-3 py-1 rounded-sm inset-shadow-2xs/30 inset-shadow-white">+ LOG</a></li>
+        </ul>
+    </ul>
+</nav>

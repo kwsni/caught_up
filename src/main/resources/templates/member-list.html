@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{base}">
+  <head>
+    <title>Browse Members</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <section>
+        <div class="flex flex-col w-[715px] divide-y divide-[#445566] gap-3 pt-5">
+          <div class="flex flex-row pb-1 justify-between items-end">
+            <h1>Members</h1>
+            <div class="flex flex-row gap-3 items-end">
+              <div class="block relative group/menu">
+                <button class="block text-nowrap text-light text-sm text-[#667788] items-center cursor-pointer active:text-white focus:text-white group-hover/menu:text-white">
+                  Sort By
+                </button>
+                <ul id="menu" class="invisible absolute right-0 z-50 rounded-sm text-[#2c3440] text-xs group-focus-within/menu:visible group-hover/menu:visible">
+                  <li>
+                    <span class="block bg-[#8899aa] text-nowrap px-2 py-1">
+                      Films Reviewed
+                    </span>
+                    <a th:href="@{/members(sort='reviewCount,desc', page=${param.page})}"
+                      class="block bg-[#8899aa] text-nowrap pl-6 pr-2 py-1 hover:bg-[#708090] hover:text-white active:bg-gray-900">
+                      Descending
+                    </a>
+                    <a th:href="@{/members(sort='reviewCount,asc', page=${param.page})}"
+                      class="block bg-[#8899aa] text-nowrap pl-6 pr-2 py-1 hover:bg-[#708090] hover:text-white active:bg-gray-900">
+                      Ascending
+                    </a>
+                  </li>
+                  <li>
+                    <span class="block bg-[#8899aa] text-nowrap px-2 py-1">
+                      Followers
+                    </span>
+                    <a th:href="@{/members(sort='followerCount,desc', page=${param.page})}"
+                      class="block bg-[#8899aa] text-nowrap pl-6 pr-2 py-1 hover:bg-[#708090] hover:text-white active:bg-gray-900">
+                      Descending
+                    </a>
+                    <a th:href="@{/members(sort='followerCount,asc', page=${param.page})}"
+                      class="block bg-[#8899aa] text-nowrap pl-6 pr-2 py-1 hover:bg-[#708090] hover:text-white active:bg-gray-900">
+                      Ascending
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-col divide-y gap-3 divide-[#2c3440]">
+            <div th:each="member : ${members}" class="pb-3">
+              <article th:replace="~{fragments/list-items :: member}"></article>
+            </div>
+          </div>
+          <div class="flex flex-row justify-between pb-10 *:only:ml-auto">
+            <a th:if="${hasPrev}" th:href="@{/members(sort=${param.sort}, page=${prevPage})}" class="px-4 py-2 rounded-sm bg-[#283038] inset-shadow-[0px_1px_rgba(255,255,255,0.05)] hover:bg-[#303840] hover:text-[#ddeefd]">Previous</a>
+            <a th:if="${hasNext}" th:href="@{/members(sort=${param.sort}, page=${nextPage})}" class="px-4 py-2 rounded-sm bg-[#283038] inset-shadow-[0px_1px_rgba(255,255,255,0.05)] hover:bg-[#303840] hover:text-[#ddeefd]">Next</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

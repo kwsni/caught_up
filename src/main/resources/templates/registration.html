@@ -1,51 +1,49 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
-  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+  layout:decorate="~{base}">
   <head>
-    <title>Register | Caught up!</title>
+    <title>Create account</title>
   </head>
   <body>
-    <h1>Create account</h1>
-    <div th:if="${param.error}">
-      Invalid parameters.
+    <div layout:fragment="content">
+      <div class="flex flex-col items-center">
+        <div class="flex flex-col pt-5 mt-10 rounded-lg bg-[#445566]">
+          <div class="grid p-5 gap-5">
+            <h1 class="w-full text-3xl text-white font-bold text-center">Create account</h1>
+            <p class="w-full text-center">
+              <span>Already have an account?</span>
+              <a th:href="@{/sign-in}" class="text-[#ddeeff] hover:text-[#40bcf4]">Sign in instead</a>
+            </p>
+          </div>
+          <form th:action="@{/create-account}" th:object="${user}" method="POST" enctype="utf8">
+            <div class="flex flex-col p-5 gap-5">
+              <p th:if="${exception != null}" th:text="${exception.getMessage()}">Exception</p>
+              <div class="flex flex-col">
+                <label for="email" th:class="${#fields.hasErrors('email')} ? 'text-[#ee7000]' : ''">Email</label>
+                <input id="email" type="email" th:field="*{email}" required th:classappend="${#fields.hasErrors('email')} ? 'border-[#ee7000]' : ''" class="border rounded-sm p-1 text-[#556677] bg-[#ccddee] focus:bg-white focus:text-[#223344]"/>
+                <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-[#ee7000]">Validation error</p>
+              </div>
+              <div class="flex flex-col">
+                <label for="username" th:class="${#fields.hasErrors('username')} ? 'text-[#ee7000]' : ''">Username</label>
+                <input id="username" th:field="*{username}" required th:classappend="${#fields.hasErrors('username')} ? 'border-[#ee7000]' : ''" class="border rounded-sm p-1 text-[#556677] bg-[#ccddee] focus:bg-white focus:text-[#223344]"/>
+                <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="text-[#ee7000]">Validation error</p>
+              </div>
+              <div class="flex flex-col">
+                <label for="password" th:class="${#fields.hasErrors('confirmPassword')} ? 'text-[#ee7000]' : ''">Password</label>
+                <input id="password" type="password" th:field="*{password}" required th:classappend="${#fields.hasErrors('confirmPassword')} ? 'border-[#ee7000]' : ''" class="border rounded-sm p-1 text-[#556677] bg-[#ccddee] focus:bg-white focus:text-[#223344]"/>
+                <p th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="text-[#ee7000]">Validation error</p>
+              </div>
+              <div class="flex flex-col">
+                <label for="confirmPassword" th:class="${#fields.hasErrors('confirmPassword')} ? 'text-[#ee7000]' : ''">Confirm password</label>
+                <input id="confirmPassword" type="password" th:field="*{confirmPassword}" required th:classappend="${#fields.hasErrors('confirmPassword')} ? 'border-[#ee7000]' : ''" class="border rounded-sm p-1 text-[#556677] bg-[#ccddee] focus:bg-white focus:text-[#223344]"/>
+                <p th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="text-[#ee7000]">Validation error</p>
+              </div>
+            </div>
+            <input type="submit" value="CREATE ACCOUNT" class="w-full p-2 font-mono font-bold rounded-b-lg cursor-pointer transition duration-150 bg-[#00ac1c] hover:bg-[#009d1a] text-white inset-shadow-2xs/30 inset-shadow-white"/>
+          </form>
+        </div>
+      </div>
     </div>
-    <form th:action="@{/create-account}" th:object="${user}" method="POST" enctype="utf8">
-      <div>
-        <label>First name</label>
-        <input th:field="*{firstName}"/>
-        <p th:each="error: ${#fields.errors('firstName')}" 
-          th:text="${error}">Validation error</p>
-      </div>
-      <div>
-        <label>Last name</label>
-        <input th:field="*{lastName}"/>
-        <p th:each="error : ${#fields.errors('lastName')}" 
-          th:text="${error}">Validation error</p>
-      </div>
-      <div>
-        <label>Username</label>
-        <input th:field="*{username}"/>
-        <p th:each="error : ${#fields.errors('username')}" 
-          th:text="${error}">Validation error</p>
-      </div>
-      <div>
-        <label>Email</label>
-        <input type="email" th:field="*{email}"/>
-        <p th:each="error : ${#fields.errors('email')}" 
-          th:text="${error}">Validation error</p>
-      </div>
-      <div>
-        <label>Password</label>
-        <input type="password" th:field="*{password}"/>
-        <p th:each="error : ${#fields.errors('password')}" 
-          th:text="${error}">Validation error</p>
-      </div>
-      <div>
-        <label>Confirm password</label>
-        <input type="password" th:field="*{confirmPassword}"/>
-      </div>
-      <button type="submit">Submit</button>
-    </form>
-    <a th:href="@{/sign-in}">Log in instead</a>
   </body>
 </html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+  layout:decorate="~{base}">
+  <head>
+    <title>Series</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <div class="flex flex-col divide-y divide-[#445566] gap-3 pt-5">
+        <div class="flex flex-row py-1 justify-between items-end">
+          <h1 class="font-light text-lg text-[#99aabb]">Popular Series</h1>
+          <a th:href="@{/series/browse}" class="text-light text-sm text-[#667788] hover:text-[#40bcf4]">Browse</a>
+        </div>
+        <div class="flex flex-row gap-3">
+          <ul class="flex flex-row gap-3">
+            <li th:each="series : ${popularSeries}" class="relative rounded-sm shadow-lg/50">
+              <img th:src="'https://artworks.thetvdb.com' + ${series.image}" class="relative object-contain rounded-sm z-20">
+              <a th:href="@{/series/{slug}(slug=${series.slug})}" class="absolute top-0 left-0 right-0 h-full rounded-sm border transition duration-150 hover:border-[#00e054] hover:inset-ring-3 hover:inset-ring-[#00e054] z-30"></a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="flex flex-col divide-y divide-[#445566] gap-3 pt-5">
+        <div class="flex flex-row py-1 justify-between items-end">
+          <h1 class="font-light text-lg text-[#99aabb]">Just reviewed...</h1>
+          <a th:href="@{/series/browse}" class="text-light text-sm text-[#667788] hover:text-[#40bcf4]">Browse</a>
+        </div>
+        <div class="flex flex-row gap-3">
+          <section th:each="review : ${justReviewed}" class="flex flex-row gap-3">
+            <article>
+              <a th:href="@{/reviews/{reviewId}(reviewId=${review.id})}">
+                <img th:src="'https://artworks.thetvdb.com' + ${review.series.image}" class="object-contain rounded-sm border">
+              </a>
+            </article>
+          </section>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

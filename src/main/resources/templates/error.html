@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error | Caught up!</title>
+    <link th:href="@{/styles/style.css}" rel="stylesheet">
+  </head>
+  <body class="flex flex-col min-h-dvh font-sans text-[#aabbcc] z-0">
+    <main class="flex-1 bg-[#14181c] z-1">
+      <div class="absolute w-full aspect-video bg-linear-to-b from-[#1e252c] to-[#14181c] to-30% z-2"></div>
+      <section class="relative w-[93%] lg:w-[950px] mx-auto z-10">
+        <h1 class="text-4xl mt-10">Error encountered</h1>
+        <p>An error occurred while processing your request.</p>
+      </section>
+    </main>
+  </body>
+</html>

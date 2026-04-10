@@ -3,16 +3,16 @@ package com.kwsni.caught_up.tvdb.model;
 import java.io.Serializable;
 
 import jakarta.annotation.Nullable;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(indexes = @Index(columnList = "series_tvdb_id, season_number"))
-public class Episode {
+public class Episode extends TvdbEntity<Long> {
     @Id
     private Long tvdbId;
 
@@ -35,7 +35,6 @@ public class Episode {
     
     private Integer absoluteNumber;
     
-    @Nullable
     private Integer runtime;
     
     private String aired;
@@ -44,10 +43,9 @@ public class Episode {
     
     private String image;
 
-    @Nullable
     private Integer imageType;
     
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String overview;
     
     private Long isMovie;
@@ -78,6 +76,10 @@ public class Episode {
     }
 
     public Long getTvdbId() {
+        return tvdbId;
+    }
+
+    public Long getId() {
         return tvdbId;
     }
 

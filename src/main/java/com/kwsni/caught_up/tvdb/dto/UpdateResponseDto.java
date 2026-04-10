@@ -8,11 +8,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
 
 public record UpdateResponseDto(
-    List<Update> data,
+    List<UpdateDto> data,
     String status,
     Links links
 ) {
-    public record Update(
+    public record UpdateDto(
         String entityType,
         Integer methodInt,
         String method,
@@ -26,7 +26,7 @@ public record UpdateResponseDto(
         @Nullable
         Long mergeToId,
         @Nullable
-        String mergeToEntityType
+        String mergeToType
     ) {}
 
     public record Links(

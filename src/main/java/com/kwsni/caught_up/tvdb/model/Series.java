@@ -2,13 +2,18 @@ package com.kwsni.caught_up.tvdb.model;
 
 import java.util.List;
 
+import org.hibernate.annotations.Formula;
+
+import com.kwsni.caught_up.social.model.Review;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 
 @Entity
-public class Series {
+public class Series extends TvdbEntity<Long>{
     @Id
     private Long tvdbId;
 
@@ -26,12 +31,19 @@ public class Series {
     
     private String image;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String overview;
     
-    @OneToMany(mappedBy = "series")
+    @OneToMany(mappedBy = "series", fetch = FetchType.LAZY)
     private List<Episode> episodes;
+
+    @OneToMany(mappedBy = "series", fetch = FetchType.LAZY)
+    private List<Review> reviews;
     
+    // Likely need to cache
+    @Formula(value = "(SELECT AVG(r.rating) FROM Review r WHERE r.series_tvdb_id = tvdb_id)")
+    private Double avgRating;
+
     private String country;
     
     private String lastUpdated;
@@ -74,6 +86,10 @@ public class Series {
     }
 
     public Long getTvdbId() {
+        return tvdbId;
+    }
+
+    public Long getId() {
         return tvdbId;
     }
 
@@ -179,6 +195,22 @@ public class Series {
 
     public void setSlug(String slug) {
         this.slug = slug;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+    }
+
+    public Double getAvgRating() {
+        return avgRating;
+    }
+
+    public void setAvgRating(Double avgRating) {
+        this.avgRating = avgRating;
     }
 
 }

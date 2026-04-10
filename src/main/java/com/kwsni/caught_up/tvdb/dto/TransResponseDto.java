@@ -21,5 +21,11 @@ public record TransResponseDto(
         Boolean isPrimary,
         @Nullable
         List<String> aliases
-    ) {}
+    ) {
+        public Data {
+        if(overview != null && overview.contains("\u0000")) {
+            overview = overview.replace("\u0000", "");
+        }
+    }
+    }
 }

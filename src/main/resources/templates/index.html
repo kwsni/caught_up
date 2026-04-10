@@ -1,19 +1,28 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
-  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{base}">
   <head>
-    <title>Caught up!</title>
+    <title>Homepage</title>
   </head>
   <body>
-    <div th:if="${param.logout} != null">
-      <p>
-          You have been logged out.
-      </p>
-    </div>
-    <h1 th:inline="text" class="font-bold text-2xl lg:text-6xl">Welcome to Caught Up, <span th:remove="tag" sec:authentication="name">user</span>!</h1>
-    <a th:href="@{/reviews}" class="inline-flex p-3 rounded-lg">See Popular Reviews</a>
-    <div sec:authorize="isAuthenticated()"><a th:href="@{/post-review}" class="inline-flex p-3 rounded-lg">Post a Review</a></div>
-    <div sec:authorize="isAnonymous()"><a th:href="@{/create-account}" class="inline-flex p-3 rounded-lg">Register</a></div>
-    <div sec:authorize="isAuthenticated()"><a th:href="@{/logout}" class="inline-flex p-3 rounded-lg">Log out</a></div>
+    <main>
+      <div layout:fragment="content">
+        <div class="absolute w-full lg:w-[950px] aspect-video bg-top bg-contain bg-no-repeat mask-x-from-70% mask-x-to-90% mask-b-from-30% mask-b-to-90% bg-[url(https://artworks.thetvdb.com/banners/fanart/original/79173-4.jpg)]"></div>
+        <div class="relative flex flex-col">
+          <div class="relative flex flex-col items-center gap-5 mt-[40%]">
+            <p th:inline="text" class="px-[20%] font-serif text-white text-center text-2xl lg:text-4xl">
+              <span>Share your binge watching habits!</span>
+              <span>Catch up on shows your friends nag you to watch.</span>
+            </p>
+            <div>
+              <a sec:authorize="isAnonymous()" th:href="@{/create-account}" class="bg-[#00ac1c] hover:bg-[#009d1a] text-white font-bold align-center py-2 px-6 rounded-sm inline-flex">
+                Get started
+              </a>
+            </div>
+        </div>
+      </div>
+    </main>
   </body>
 </html>

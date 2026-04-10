@@ -11,9 +11,9 @@ public record SeasonBaseRecordDto(
     List<String> nameTranslations,
     Long number,
     List<String> overviewTranslations,
-    List<Companies> companies,
+    //List<Companies> companies,
     Long seriesId,
-    SeasonType seasonType,
+    SeasonType type,
     String year
 
 ) {
