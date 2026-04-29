@@ -1,8 +1,5 @@
 package com.kwsni.caught_up.tvdb.model;
 
-import java.io.Serializable;
-
-import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

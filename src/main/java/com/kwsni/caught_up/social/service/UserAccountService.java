@@ -1,6 +1,5 @@
 package com.kwsni.caught_up.social.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -8,6 +7,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.kwsni.caught_up.social.controller.dto.ChangePasswordDto;
+import com.kwsni.caught_up.social.controller.dto.UserRegistrationDto;
 import com.kwsni.caught_up.social.model.Member;
 import com.kwsni.caught_up.social.model.UserAccount;
 import com.kwsni.caught_up.social.repository.MemberRepository;
@@ -15,32 +16,36 @@ import com.kwsni.caught_up.social.repository.UserAccountRepository;
 
 @Service
 public class UserAccountService implements UserDetailsService {
+    private final MemberRepository memberRepo;
+    private final UserAccountRepository usrAccRepo;
+    private final PasswordEncoder pwdEncoder;
 
-    @Autowired
-    private MemberRepository memberRepository;
-    
-    @Autowired
-    private UserAccountRepository userAccountRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public UserAccountService(
+        MemberRepository memberRepo,
+        UserAccountRepository usrAccRepo,
+        PasswordEncoder pwdEncoder
+    ) {
+        this.memberRepo = memberRepo;
+        this.usrAccRepo = usrAccRepo;
+        this.pwdEncoder = pwdEncoder;
+    }
 
     public UserAccount loadUserAccountByUsername(String username) {
-        UserAccount userAccount = userAccountRepository.findByUsername(username);
+        var usrAcc = usrAccRepo.findByUsername(username);
 
-        if(userAccount == null) {
+        if(usrAcc == null) {
             throw new UsernameNotFoundException("User not found");
         }
-        return userAccount;
+        return usrAcc;
     }
 
     public UserAccount loadUserAccountByEmail(String email) {
-        UserAccount userAccount = userAccountRepository.findByEmail(email);
+        var usrAcc = usrAccRepo.findByEmail(email);
 
-        if(userAccount == null) {
+        if(usrAcc == null) {
             throw new UsernameNotFoundException("User not found");
         }
-        return userAccount;
+        return usrAcc;
     }
 
     @Override
@@ -48,44 +53,64 @@ public class UserAccountService implements UserDetailsService {
         return loadUserAccountByUsername(username);
     }
 
-    public void createUser(String username, String email, String password, String confirmPassword) {
-        Member existingMember = memberRepository.findByUsername(username);
-        Member existingEmail = memberRepository.findByEmail(email);
+    public void createUser(UserRegistrationDto registerDto) {
+        var existingMember = memberRepo.findByUsername(registerDto.username());
+        var existingEmail = memberRepo.findByEmail(registerDto.email());
 
         if(existingMember != null || existingEmail != null ) {
             throw new UserAlreadyExistsException();
         }
 
-        if(!password.equals(confirmPassword)) {
+        if(!registerDto.password().equals(registerDto.confirmPassword())) {
             throw new PasswordNotConfirmedException();
         }
 
-        String encodedPassword = passwordEncoder.encode(password);
+        String encodedPwd = pwdEncoder.encode(registerDto.password());
 
-        Member newMember = new Member(
-            email,
-            username,
-            encodedPassword,
+        var newMember = new Member(
+            registerDto.email(),
+            registerDto.username(),
+            encodedPwd,
             "user");
-        memberRepository.save(newMember);
+        memberRepo.save(newMember);
     }
 
-    public void updatePassword(String username, String currentPassword, String newPassword, String confirmPassword) throws BadCredentialsException {
-        if(!newPassword.equals(confirmPassword)) {
+    public void updatePassword(
+        String username,
+        ChangePasswordDto changePwdDto
+    ) throws BadCredentialsException {
+        if(!changePwdDto.newPassword().equals(changePwdDto.confirmPassword())) {
             throw new PasswordNotConfirmedException();
         }
 
-        UserAccount userAccount = loadUserAccountByUsername(username);
+        var usrAcc = loadUserAccountByUsername(username);
         
-        if(!passwordEncoder.matches(currentPassword, userAccount.getPassword())) {
+        if(!pwdEncoder.matches(changePwdDto.currentPassword(), usrAcc.getPassword())) {
             throw new BadCredentialsException("Unable to authenticate user with given credentials");
         }
 
-        String encodedPassword = passwordEncoder.encode(newPassword);
+        var encodedPassword = pwdEncoder.encode(changePwdDto.newPassword());
 
-        userAccount.setPassword(encodedPassword);
+        usrAcc.setPassword(encodedPassword);
 
-        userAccountRepository.save(userAccount);
+        usrAccRepo.save(usrAcc);
+    }
+
+    public UserRegistrationDto createRegistrationForm() {
+        return new UserRegistrationDto(
+            "",
+            "",
+            "",
+            ""
+        );
+    }
+
+    public ChangePasswordDto createPasswordForm() {
+        return new ChangePasswordDto(
+            null,
+            null,
+            null
+        );
     }
 
     public class BadUserInputException extends RuntimeException {

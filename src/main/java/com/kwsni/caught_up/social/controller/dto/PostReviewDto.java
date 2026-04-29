@@ -1,4 +1,4 @@
-package com.kwsni.caught_up.social.dto;
+package com.kwsni.caught_up.social.controller.dto;
 
 import java.time.LocalDate;
 

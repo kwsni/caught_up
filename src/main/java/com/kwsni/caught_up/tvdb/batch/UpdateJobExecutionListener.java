@@ -2,18 +2,23 @@ package com.kwsni.caught_up.tvdb.batch;
 
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.listener.JobExecutionListener;
-
-import com.kwsni.caught_up.tvdb.batch.repository.UpdateRecordRepository;
+import org.springframework.data.redis.core.RedisTemplate;
 
 public class UpdateJobExecutionListener implements JobExecutionListener{
-    private final UpdateRecordRepository updateRecordRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
-    public UpdateJobExecutionListener(UpdateRecordRepository updateRecordRepository) {
-        this.updateRecordRepository = updateRecordRepository;
+    public UpdateJobExecutionListener(RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
+
+    @Override
+    public void beforeJob(JobExecution jobExecution) {
+        jobExecution.getExecutionContext().put("lastUpdated", redisTemplate.opsForValue().get("lastUpdated"));
     }
 
     @Override
     public void afterJob(JobExecution jobExecution) {
-        updateRecordRepository.deleteAll();
+        String lastUpdated = String.valueOf(jobExecution.getExecutionContext().getString("lastReadUpdated"));
+        redisTemplate.opsForValue().set("lastUpdated", lastUpdated);
     }
 }

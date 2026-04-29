@@ -20,7 +20,7 @@ public record UpdateResponseDto(
         Integer userId,
         String recordType,
         Long recordId,
-        Long timestamp,
+        Long timeStamp,
         Long seriesId,
         // Only present for episodes records:
         @Nullable

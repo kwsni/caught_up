@@ -2,7 +2,6 @@ package com.kwsni.caught_up.social.controller;
 
 import java.security.Principal;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,11 +10,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import com.kwsni.caught_up.social.dto.ChangePasswordDto;
-import com.kwsni.caught_up.social.dto.UserProfileDto;
-import com.kwsni.caught_up.social.dto.UserRegistrationDto;
-import com.kwsni.caught_up.social.model.Member;
-import com.kwsni.caught_up.social.repository.MemberRepository;
+import com.kwsni.caught_up.social.controller.dto.ChangePasswordDto;
+import com.kwsni.caught_up.social.controller.dto.UserProfileDto;
+import com.kwsni.caught_up.social.controller.dto.UserRegistrationDto;
+import com.kwsni.caught_up.social.service.MemberService;
 import com.kwsni.caught_up.social.service.UserAccountService;
 import com.kwsni.caught_up.social.service.UserAccountService.PasswordNotConfirmedException;
 import com.kwsni.caught_up.social.service.UserAccountService.UserAlreadyExistsException;
@@ -24,19 +22,21 @@ import com.kwsni.caught_up.social.service.UserAccountService.UserAlreadyExistsEx
 
 @Controller
 public class AuthenticationController {
-    @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
-    private UserAccountService userAccountService;
+    private final MemberService memberSvc;
+    private final UserAccountService usrAccSvc;
+
+    public AuthenticationController(
+        MemberService memberSvc,
+        UserAccountService usrAccSvc
+    ) {
+        this.memberSvc = memberSvc;
+        this.usrAccSvc = usrAccSvc;
+    }
 
     @GetMapping("/create-account")
     public String showRegistrationForm(Model model) {
-        UserRegistrationDto registerDto = new UserRegistrationDto(
-            "",
-            "",
-            "",
-            ""
-        );
+        var registerDto = usrAccSvc.createRegistrationForm();
+
         model.addAttribute("user", registerDto);
         return "registration";
     }
@@ -56,12 +56,7 @@ public class AuthenticationController {
             return "registration";
         }
         try {
-            userAccountService.createUser(
-                registerDto.username(),
-                registerDto.email(),
-                registerDto.password(),
-                registerDto.confirmPassword()
-            );
+            usrAccSvc.createUser(registerDto);
             return "redirect:/sign-in";
         } catch(UserAlreadyExistsException e) {
             bindingResult.rejectValue("username", null, e.getMessage());
@@ -78,17 +73,12 @@ public class AuthenticationController {
     }
     
     @GetMapping("/settings")
-    public String accountSettings(Model model, Principal principal) {
-        Member profileMember = memberRepository.findByUsername(principal.getName());
-        UserProfileDto profileDto = new UserProfileDto(
-            profileMember.getAvatar(),
-            profileMember.getFirstName(),
-            profileMember.getLastName(),
-            profileMember.getBio(),
-            profileMember.getLocation(),
-            profileMember.getWebsite(),
-            profileMember.getPronoun()
-        );
+    public String accountSettings(
+        Model model,
+        Principal principal
+    ) {
+        var username = principal.getName();
+        var profileDto = memberSvc.getProfile(username);
 
         model.addAttribute("profileDto", profileDto);
         return "settings";
@@ -99,29 +89,15 @@ public class AuthenticationController {
         @ModelAttribute UserProfileDto profileDto,
         Principal principal
     ) {
-        Member profileMember = memberRepository.findByUsername(principal.getName());
-        
-        profileMember.setAvatar(profileDto.avatar());
-        profileMember.setFirstName(profileDto.firstName());
-        profileMember.setLastName(profileDto.lastName());
-        profileMember.setBio(profileDto.bio());
-        profileMember.setLocation(profileDto.location());
-        profileMember.setWebsite(profileDto.website()       .replace("http://", "")
-            .replace("https://", "")
-        );
+        var username = principal.getName();
 
-        memberRepository.save(profileMember);
-        
-        return "redirect:/members/" + principal.getName();
+        memberSvc.modifyProfile(profileDto, username);
+        return "redirect:/members/" + username;
     }
     
     @GetMapping("/settings/password")
     public String passwordPage(Model model) {
-        ChangePasswordDto passwordDto = new ChangePasswordDto(
-            null,
-            null,
-            null
-        );
+        var passwordDto = usrAccSvc.createPasswordForm();
 
         model.addAttribute("passwordDto", passwordDto);
         return "password";
@@ -133,17 +109,17 @@ public class AuthenticationController {
         BindingResult bindingResult,
         Principal principal
     ) {
+        var username = principal.getName();
+        
         if(bindingResult.hasErrors()) {
             return "password";
         }
         try {
-            userAccountService.updatePassword(
-                principal.getName(),
-                passwordDto.currentPassword(),
-                passwordDto.newPassword(),
-                passwordDto.confirmPassword()
+            usrAccSvc.updatePassword(
+                username,
+                passwordDto
             );
-            return "redirect:/members/" + principal.getName();
+            return "redirect:/members/" + username;
         } catch(PasswordNotConfirmedException e) {
             bindingResult.rejectValue("confirmPassword", null, e.getMessage());
             return "password";

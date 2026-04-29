@@ -6,11 +6,11 @@ import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.listener.JobExecutionListener;
 import org.springframework.data.redis.core.RedisTemplate;
 
-public class TimestampJobExecutionListener implements JobExecutionListener {
+public class InitialSyncJobExecutionListener implements JobExecutionListener {
     private final RedisTemplate<String, String> redisTemplate;
 
 
-    public TimestampJobExecutionListener(RedisTemplate<String, String> redisTemplate) {
+    public InitialSyncJobExecutionListener(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 

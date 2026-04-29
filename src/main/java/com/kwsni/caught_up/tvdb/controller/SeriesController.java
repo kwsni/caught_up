@@ -2,18 +2,9 @@ package com.kwsni.caught_up.tvdb.controller;
 
 import java.security.Principal;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,42 +14,41 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.kwsni.caught_up.social.dto.PostReviewDto;
+import com.kwsni.caught_up.social.controller.dto.PostReviewDto;
 import com.kwsni.caught_up.social.model.Member;
 import com.kwsni.caught_up.social.model.Review;
-import com.kwsni.caught_up.social.repository.MemberRepository;
-import com.kwsni.caught_up.social.repository.ReviewRepository;
-import com.kwsni.caught_up.tvdb.model.Episode;
+import com.kwsni.caught_up.social.service.MemberService;
+import com.kwsni.caught_up.social.service.ReviewService;
 import com.kwsni.caught_up.tvdb.model.Series;
-import com.kwsni.caught_up.tvdb.repository.EpisodeRepository;
-import com.kwsni.caught_up.tvdb.repository.SeriesRepository;
+import com.kwsni.caught_up.tvdb.service.EpisodeService;
+import com.kwsni.caught_up.tvdb.service.SeriesService;
 
 @Controller
 @RequestMapping("/series")
 public class SeriesController {
+    private final SeriesService seriesSvc;
+    private final EpisodeService episodeSvc;
+    private final ReviewService reviewSvc;
+    private final MemberService memberSvc;
 
-    @Autowired
-    private SeriesRepository seriesRepository;
-
-    @Autowired
-    private EpisodeRepository episodeRepository;
-
-    @Autowired
-    private ReviewRepository reviewRepository;
-
-    @Autowired
-    private MemberRepository memberRepository;
-
+    public SeriesController(
+        SeriesService seriesSvc,
+        EpisodeService episodeSvc,
+        ReviewService reviewSvc,
+        MemberService memberSvc
+    ) {
+        this.seriesSvc = seriesSvc;
+        this.episodeSvc = episodeSvc;
+        this.reviewSvc = reviewSvc;
+        this.memberSvc = memberSvc;
+    }
     @GetMapping
     public String homeSeries(Model model) {
-        Pageable sortedByPopularityDesc = PageRequest.of(0, 4, Sort.by("score").descending());
-        Page<Series> popularSeriesList = seriesRepository.findAll(sortedByPopularityDesc);
-
-        Pageable sortedByDateDesc = PageRequest.of(0, 12, Sort.by("createdDate").descending());
-        Page<Review> justReviewedList = reviewRepository.findAll(sortedByDateDesc);
-
-        model.addAttribute("popularSeries", popularSeriesList);
-        model.addAttribute("justReviewed", justReviewedList);
+        var popularSeries = seriesSvc.getPopularSeries();
+        var justReviewed = reviewSvc.getRecentReviews();
+        
+        model.addAttribute("popularSeries", popularSeries);
+        model.addAttribute("justReviewed", justReviewed);
 
         return "series-home";
     }
@@ -70,35 +60,26 @@ public class SeriesController {
         @RequestParam(defaultValue="0") int page,
         Model model
     ) {
-        String sortField = sort[0];
-        String sortDir = sort[1];
+        var seriesPage = seriesSvc.getSortedSeriesPage(sort, size, page);
 
-        Direction dir = sortDir.equals("desc") ? Direction.DESC : Direction.ASC;
-        boolean isLarge = size.equals("lg");
-        int pageSize = isLarge ? 18 : 72;
-        
-        Pageable sortBy = PageRequest.of(page, pageSize, Sort.by(Sort.Order.by(sortField).with(dir).nullsLast()));
-        Page<Series> seriesList = seriesRepository.findAll(sortBy);
-
-        model.addAttribute("seriesList", seriesList);
-        model.addAttribute("isLarge", isLarge);
+        model.addAttribute("seriesList", seriesPage);
+        model.addAttribute("isLarge", size.equals("lg"));
         model.addAttribute("prevPage", page - 1);
         model.addAttribute("nextPage", page + 1);
-        model.addAttribute("hasPrev", seriesList.hasPrevious());
-        model.addAttribute("hasNext", seriesList.hasNext());
+        model.addAttribute("hasPrev", seriesPage.hasPrevious());
+        model.addAttribute("hasNext", seriesPage.hasNext());
 
         return "series-list";
     }
 
     @GetMapping("/{slug}")
     public String showSeries(@PathVariable("slug") String slug, Model model) {
-        Series series = seriesRepository.findBySlug(slug).get();
-        Map<Integer, List<Episode>> episodesBySeason = episodeRepository.findBySeries(series, Sort.by("seasonNumber", "number").ascending())
-            .stream().collect(Collectors.groupingBy(Episode::getSeasonNumber));
-        //TODO: SORT BY LIKES SIZE USING JPQL?
-        Page<Review> popularReviews = reviewRepository.findBySeries_Slug(slug, PageRequest.of(0, 3, Sort.by("id").descending()));
-        Double avgRating = reviewRepository.avgRatingsBySeries_Slug(slug);
-
+        var series = seriesSvc.getSeries(slug).orElseThrow();
+        var episodesBySeason = episodeSvc.getEpisodesGroupedBySeason(series);
+        var popularReviews = reviewSvc.getPopularReviews(slug);
+        var avgRating = reviewSvc.avgRating(slug);
+        
+        // Remove non-regular episodes
         episodesBySeason.remove(0);
 
         model.addAttribute("series", series);
@@ -123,23 +104,12 @@ public class SeriesController {
         TimeZone timezone,
         Principal principal,
         Model model) {
-            Member author = memberRepository.findByUsername(principal.getName());
-            Series series = seriesRepository.findBySlug(slug).get();
-            ZoneId tz = timezone.toZoneId();
+            Member author = memberSvc.getMember(principal.getName());
+            Series series = seriesSvc.getSeries(slug).orElseThrow();
+            
+            var reviewId = reviewSvc.saveReview(author, series, postReview, timezone);
 
-            Review newReview = new Review(
-                author,
-                series,
-                postReview.content(),
-                postReview.watchedOn() != null ? postReview.watchedOn().atStartOfDay(tz).toOffsetDateTime() : null,
-                postReview.rating(),
-                postReview.isSpoiler(),
-                postReview.like()
-            );
-
-            newReview = reviewRepository.save(newReview);
-
-            return "redirect:/reviews/" + newReview.getId();
+            return "redirect:/reviews/" + reviewId;
     }
 
     @GetMapping("/{slug}/reviews")
@@ -150,21 +120,8 @@ public class SeriesController {
         @RequestParam(defaultValue="0") int page,
         Model model
     ) {
-        String sortField = sort[0];
-        String sortDir = sort[1];
-
-        Direction dir = sortDir.equals("desc") ? Direction.DESC : Direction.ASC;
-
-        Pageable sortBy = PageRequest.of(page, 12, Sort.by(Sort.Order.by(sortField).with(dir).nullsLast()));
-        Page<Review> reviewsList;
-        if(rating != null) {
-            reviewsList = reviewRepository.findBySeries_SlugAndRating(slug, rating, sortBy);
-        } else {
-            reviewsList = reviewRepository.findBySeries_Slug(slug, sortBy);
-        }
-
-        Series series = seriesRepository.findBySlug(slug).get();
-
+        Page<Review> reviewsList = reviewSvc.getSeriesReviewList(slug, rating, sort, page);
+        Series series = seriesSvc.getSeries(slug).orElseThrow();
 
         model.addAttribute("series", series);
         model.addAttribute("reviews", reviewsList);

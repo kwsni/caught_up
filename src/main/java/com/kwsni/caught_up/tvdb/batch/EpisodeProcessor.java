@@ -4,46 +4,23 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.infrastructure.item.ItemProcessor;
 
+import com.kwsni.caught_up.tvdb.batch.service.TvdbService;
 import com.kwsni.caught_up.tvdb.dto.EpisodeBaseRecordDto;
 import com.kwsni.caught_up.tvdb.model.Episode;
-import com.kwsni.caught_up.tvdb.model.Series;
-
-import jakarta.persistence.EntityManager;
 
 public class EpisodeProcessor implements ItemProcessor<EpisodeBaseRecordDto, Episode> {
-    private EntityManager entityManager;
+    private TvdbService tvdbSvc;
     private Log logger = LogFactory.getLog(getClass());
 
-    public EpisodeProcessor(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public EpisodeProcessor(TvdbService tvdbSvc) {
+        this.tvdbSvc = tvdbSvc;
     }
 
     @Override
     public Episode process(EpisodeBaseRecordDto episodeDto) throws Exception {
         if(logger.isDebugEnabled()) {
             logger.debug("Processing episode from series " + episodeDto.seriesId() + ": " + episodeDto.id() + " - S" + episodeDto.seasonNumber() + " E" + episodeDto.number());
-            logger.debug(episodeDto);
         }
-        Episode episode = new Episode(episodeDto.id(),
-            episodeDto.name(),
-            entityManager.getReference(Series.class,
-                episodeDto.seriesId()
-            ),
-            episodeDto.seasonNumber(),
-            episodeDto.seasonName(),
-            episodeDto.airsAfterSeason(),
-            episodeDto.airsBeforeEpisode(),
-            episodeDto.airsBeforeSeason(),
-            episodeDto.number(),
-            episodeDto.absoluteNumber(),
-            episodeDto.runtime(),
-            episodeDto.aired(),
-            episodeDto.year(),
-            episodeDto.image(),
-            episodeDto.imageType(),
-            episodeDto.overview(),
-            episodeDto.isMovie()
-        );
-        return episode;
+        return tvdbSvc.mapToEpisode(episodeDto);
     }
 }

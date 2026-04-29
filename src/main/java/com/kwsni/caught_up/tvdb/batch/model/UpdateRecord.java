@@ -19,15 +19,18 @@ public class UpdateRecord {
 
     private String mergeToType;
 
+    private Long timestamp;
+
     protected UpdateRecord() {}
 
-    public UpdateRecord(String entityType, Integer methodInt, String method, Long recordId , Long mergeToId, String mergeToType) {
+    public UpdateRecord(String entityType, Integer methodInt, String method, Long recordId , Long mergeToId, String mergeToType, Long timestamp) {
         this.entityType = entityType;
         this.methodInt = methodInt;
         this.method = method;
         this.recordId = recordId;
         this.mergeToId = mergeToId;
         this.mergeToType = mergeToType;
+        this.timestamp = timestamp;
     }
 
     public String getEntityType() {
@@ -48,6 +51,10 @@ public class UpdateRecord {
 
     public Long getMergeToId() {
         return mergeToId;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
     }
 
     public void setEntityType(String entityType) {
@@ -76,5 +83,9 @@ public class UpdateRecord {
 
     public void setMergeToType(String mergeToType) {
         this.mergeToType = mergeToType;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
     }
 }

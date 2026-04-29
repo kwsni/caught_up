@@ -2,7 +2,6 @@ package com.kwsni.caught_up.config;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
@@ -15,7 +14,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpRequest;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
 
 import com.kwsni.caught_up.tvdb.dto.TvdbLoginRequestDto;
@@ -38,13 +36,15 @@ public class TvdbConfig {
                 .httpComponents()
                 .build(HttpClientSettings
                     .defaults()
-                    .withConnectTimeout(Duration.ofMinutes(5))
-                    .withReadTimeout(Duration.ofMinutes(5))
+                    .withConnectTimeout(Duration.ofSeconds(10))
+                    .withReadTimeout(Duration.ofSeconds(30))
                 )
             )
             .requestInterceptor((request, body, execution) -> {
                 request.getHeaders().add("Authorization", "Bearer " + getAccessToken(baseUrl, apiKey));
-                logRequest(request, body);
+                if(logger.isTraceEnabled()) {
+                    logRequest(request, body);
+                }
                 return execution.execute(request, body);
             })
             .build();
@@ -72,17 +72,9 @@ public class TvdbConfig {
     }
 
     private void logRequest(HttpRequest request, byte[] body) {
-        logger.debug("Request: {} {}", request.getMethod(), request.getURI());
+        logger.trace("Request: {} {}", request.getMethod(), request.getURI());
         if (body != null && body.length > 0) {
-            logger.debug("Request body: {}", new String(body, StandardCharsets.UTF_8));
-        }
-    }
-
-    private void logResponse(HttpRequest request, ClientHttpResponse response) throws IOException {
-        logger.debug("Response status: {}", response.getStatusCode());
-        byte[] responseBody = response.getBody().readAllBytes();
-        if (responseBody.length > 0) {
-            logger.debug("Response body: {}", new String(responseBody, StandardCharsets.UTF_8));
+            logger.trace("Request body: {}", new String(body, StandardCharsets.UTF_8));
         }
     }
 }

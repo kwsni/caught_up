@@ -2,14 +2,6 @@ package com.kwsni.caught_up.tvdb.dto;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.Nulls;
-
-import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
-
 public record EpisodeBaseRecordDto (
     Integer absoluteNumber,
     String aired,
@@ -31,7 +23,7 @@ public record EpisodeBaseRecordDto (
     Integer runtime,
     Integer seasonNumber,
     List<SeasonBaseRecordDto> seasons,
-    Integer seriesId,
+    Long seriesId,
     String seasonName,
     String year
 ) {

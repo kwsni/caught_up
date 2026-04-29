@@ -17,7 +17,8 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.kwsni.caught_up.social.dto.UserRegistrationDto;
+import com.kwsni.caught_up.social.controller.dto.UserRegistrationDto;
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
