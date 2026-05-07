@@ -104,10 +104,10 @@ public class SeriesController {
         TimeZone timezone,
         Principal principal,
         Model model) {
-            Member author = memberSvc.getMember(principal.getName());
+            Member author = memberSvc.getMemberByUsername(principal.getName()); // TODO: get principal securely
             Series series = seriesSvc.getSeries(slug).orElseThrow();
             
-            var reviewId = reviewSvc.saveReview(author, series, postReview, timezone);
+            var reviewId = reviewSvc.saveReview(author, series, postReview, timezone, false);
 
             return "redirect:/reviews/" + reviewId;
     }

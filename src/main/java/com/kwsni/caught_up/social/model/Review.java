@@ -22,6 +22,7 @@ import jakarta.persistence.OneToMany;
 
 @Entity
 public class Review {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -65,9 +66,12 @@ public class Review {
     @CreationTimestamp
     private OffsetDateTime createdDate;
 
+    @Column(columnDefinition = "boolean default false")
+    private boolean isGenerated;
+
     protected Review() {}
     
-    public Review(Member author, Series series, String content, OffsetDateTime watchedDate, Double rating, boolean isSpoiler, boolean liked) {
+    public Review(Member author, Series series, String content, OffsetDateTime watchedDate, Double rating, boolean isSpoiler, boolean liked, boolean isGenerated) {
         this.author = author;
         this.series = series;
         this.content = content;
@@ -75,6 +79,7 @@ public class Review {
         this.rating = rating;
         this.isSpoiler = isSpoiler;
         this.liked = liked;
+        this.isGenerated = isGenerated;
     }
 
     public long getId() {
@@ -163,6 +168,14 @@ public class Review {
 
     public void setComments(List<ReviewComment> comments) {
         this.comments = comments;
+    }
+
+    public boolean isGenerated() {
+        return isGenerated;
+    }
+
+    public void setGenerated(boolean isGenerated) {
+        this.isGenerated = isGenerated;
     }
     
 }

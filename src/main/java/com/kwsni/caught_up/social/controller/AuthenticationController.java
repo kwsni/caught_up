@@ -14,28 +14,22 @@ import com.kwsni.caught_up.social.controller.dto.ChangePasswordDto;
 import com.kwsni.caught_up.social.controller.dto.UserProfileDto;
 import com.kwsni.caught_up.social.controller.dto.UserRegistrationDto;
 import com.kwsni.caught_up.social.service.MemberService;
-import com.kwsni.caught_up.social.service.UserAccountService;
-import com.kwsni.caught_up.social.service.UserAccountService.PasswordNotConfirmedException;
-import com.kwsni.caught_up.social.service.UserAccountService.UserAlreadyExistsException;
+import com.kwsni.caught_up.social.service.MemberService.PasswordNotConfirmedException;
+import com.kwsni.caught_up.social.service.MemberService.UserAlreadyExistsException;
 
 
 
 @Controller
 public class AuthenticationController {
     private final MemberService memberSvc;
-    private final UserAccountService usrAccSvc;
 
-    public AuthenticationController(
-        MemberService memberSvc,
-        UserAccountService usrAccSvc
-    ) {
+    public AuthenticationController(MemberService memberSvc) {
         this.memberSvc = memberSvc;
-        this.usrAccSvc = usrAccSvc;
     }
 
     @GetMapping("/create-account")
     public String showRegistrationForm(Model model) {
-        var registerDto = usrAccSvc.createRegistrationForm();
+        var registerDto = memberSvc.createRegistrationForm();
 
         model.addAttribute("user", registerDto);
         return "registration";
@@ -56,7 +50,7 @@ public class AuthenticationController {
             return "registration";
         }
         try {
-            usrAccSvc.createUser(registerDto);
+            memberSvc.createUser(registerDto, false);
             return "redirect:/sign-in";
         } catch(UserAlreadyExistsException e) {
             bindingResult.rejectValue("username", null, e.getMessage());
@@ -97,7 +91,7 @@ public class AuthenticationController {
     
     @GetMapping("/settings/password")
     public String passwordPage(Model model) {
-        var passwordDto = usrAccSvc.createPasswordForm();
+        var passwordDto = memberSvc.createPasswordForm();
 
         model.addAttribute("passwordDto", passwordDto);
         return "password";
@@ -115,7 +109,7 @@ public class AuthenticationController {
             return "password";
         }
         try {
-            usrAccSvc.updatePassword(
+            memberSvc.updatePassword(
                 username,
                 passwordDto
             );

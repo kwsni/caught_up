@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.kwsni</groupId>
 	<artifactId>caught_up</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<name>caught_up</name>
 	<description>Social website for TV series logging and reviews</description>
 	<url/>
@@ -29,22 +29,32 @@
 	<properties>
 		<java.version>25</java.version>
 		<groovy.version>5.0.3</groovy.version>
-		<spring-ai.version>2.0.0-M4</spring-ai.version>
+		<spring-ai.version>2.0.0-M5</spring-ai.version>
 	</properties>
 	<dependencies>
+		<dependency>
+			<groupId>net.datafaker</groupId>
+			<artifactId>datafaker</artifactId>
+			<version>2.5.4</version>
+		</dependency>
 		<dependency>
 			<groupId>nz.net.ultraq.thymeleaf</groupId>
 			<artifactId>thymeleaf-layout-dialect</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-rng-sampling</artifactId>
+			<version>1.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-rng-simple</artifactId>
+			<version>1.7</version>
+		</dependency>
+		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
      	</dependency>
-		<dependency>
-			<groupId>com.github.javafaker</groupId>
-			<artifactId>javafaker</artifactId>
-			<version>1.0.2</version>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-google-genai</artifactId>

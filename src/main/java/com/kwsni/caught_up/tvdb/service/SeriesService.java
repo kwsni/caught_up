@@ -1,5 +1,6 @@
 package com.kwsni.caught_up.tvdb.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.kwsni.caught_up.tvdb.model.Series;
+import com.kwsni.caught_up.tvdb.repository.PopularityScore;
 import com.kwsni.caught_up.tvdb.repository.SeriesRepository;
 
 @Service
@@ -44,5 +46,13 @@ public class SeriesService {
 
     public Optional<Series> getSeries(String slug) {
         return seriesRepo.findBySlug(slug);
+    }
+
+    public Optional<Series> getSeries(Long tvdbId) {
+        return seriesRepo.findById(tvdbId);
+    }
+
+    public List<PopularityScore> getPopularSeriesScores() {
+        return seriesRepo.queryAllByOrderByTvdbIdAsc();
     }
 }

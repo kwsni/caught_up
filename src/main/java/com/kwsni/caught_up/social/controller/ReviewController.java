@@ -82,7 +82,7 @@ public class ReviewController {
         Principal principal,
         Model model
     ) {
-        var author = memberSvc.getMember(principal.getName());
+        var author = memberSvc.getMemberByUsername(principal.getName());
 
         reviewSvc.saveReviewComment(reviewId, postComment, author);
         return "redirect:/reviews/" + reviewId;
@@ -95,7 +95,7 @@ public class ReviewController {
         @RequestHeader(value = HttpHeaders.REFERER, required = false) final String referrer,
         Principal principal
     ) {
-        var member = memberSvc.getMember(principal.getName());
+        var member = memberSvc.getMemberByUsername(principal.getName());
 
         reviewSvc.likeReview(reviewId, member);    
         return "redirect:" + referrer;
@@ -107,7 +107,7 @@ public class ReviewController {
         @RequestHeader(value = HttpHeaders.REFERER, required = false) final String referrer,
         Principal principal
     ) {
-        var member = memberSvc.getMember(principal.getName());
+        var member = memberSvc.getMemberByUsername(principal.getName());
         
         reviewSvc.unlikeReview(reviewId, member);
         return "redirect:" + referrer;

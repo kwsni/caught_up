@@ -4,19 +4,28 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
+import com.kwsni.caught_up.social.controller.dto.ChangePasswordDto;
 import com.kwsni.caught_up.social.controller.dto.UserProfileDto;
+import com.kwsni.caught_up.social.controller.dto.UserRegistrationDto;
 import com.kwsni.caught_up.social.model.Member;
 import com.kwsni.caught_up.social.model.MemberFollow;
 import com.kwsni.caught_up.social.model.MemberFollowKey;
 import com.kwsni.caught_up.social.model.Review;
+import com.kwsni.caught_up.social.model.UserAccount;
 import com.kwsni.caught_up.social.repository.MemberFollowRepository;
 import com.kwsni.caught_up.social.repository.MemberRepository;
 import com.kwsni.caught_up.social.service.dto.MemberListDto;
@@ -24,27 +33,120 @@ import com.kwsni.caught_up.social.service.dto.MemberProfileDto;
 import com.kwsni.caught_up.social.service.dto.MemberReviewsDto;
 
 @Service
-public class MemberService {
+public class MemberService implements UserDetailsService {
     private final MemberRepository memberRepo;
     private final MemberFollowRepository memberFollowRepo;
     private final ReviewService reviewSvc;
+    private final PasswordEncoder pwdEncoder;
 
     public MemberService(
         MemberRepository memberRepo,
         MemberFollowRepository memberFollowRepo,
-        ReviewService reviewSvc
+        ReviewService reviewSvc,
+        PasswordEncoder pwdEncoder
     ) {
         this.memberRepo = memberRepo;
         this.memberFollowRepo = memberFollowRepo;
         this.reviewSvc = reviewSvc;
+        this.pwdEncoder = pwdEncoder;
     }
 
-    public Member getMember(String username) {
-        return memberRepo.findByUsername(username);
+    @Override
+    public UserDetails loadUserByUsername(String username) {
+        var user = memberRepo.findByUsername(username);
+
+        if(user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        return new UserAccount(user);
+    }
+
+    public Member getMemberByUsername(String username) {
+        var member = memberRepo.findByUsername(username);
+
+        if(member == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        return member;
+    }
+
+    public Member getMemberByEmail(String email) {
+        var member = memberRepo.findByUsername(email);
+
+        if(member == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        return member;
+    }
+
+    public void createUser(UserRegistrationDto registerDto, boolean isGenerated) {
+        var existingMember = memberRepo.findByUsername(registerDto.username());
+        var existingEmail = memberRepo.findByEmail(registerDto.email());
+
+        if(existingMember != null || existingEmail != null ) {
+            throw new UserAlreadyExistsException();
+        }
+
+        if(!registerDto.password().equals(registerDto.confirmPassword())) {
+            throw new PasswordNotConfirmedException();
+        }
+
+        String encodedPwd = pwdEncoder.encode(registerDto.password());
+
+        var newMember = new Member(
+            registerDto.email(),
+            registerDto.username(),
+            encodedPwd,
+            "user",
+            isGenerated
+        );
+        memberRepo.save(newMember);
+    }
+
+    public void updatePassword(
+        String username,
+        ChangePasswordDto changePwdDto
+    ) throws BadCredentialsException {
+        if(!changePwdDto.newPassword().equals(changePwdDto.confirmPassword())) {
+            throw new PasswordNotConfirmedException();
+        }
+
+        var member = getMemberByUsername(username);
+        
+        if(!pwdEncoder.matches(changePwdDto.currentPassword(), member.getPassword())) {
+            throw new BadCredentialsException("Unable to authenticate user with given credentials");
+        }
+
+        var encodedPassword = pwdEncoder.encode(changePwdDto.newPassword());
+
+        member.setPassword(encodedPassword);
+
+        memberRepo.save(member);
+    }
+
+    public UserRegistrationDto createRegistrationForm() {
+        return new UserRegistrationDto(
+            "",
+            "",
+            "",
+            ""
+        );
+    }
+
+    public ChangePasswordDto createPasswordForm() {
+        return new ChangePasswordDto(
+            null,
+            null,
+            null
+        );
+    }
+
+    public List<Member> sampleGeneratedMembers(int rowLimit, int reviewLimit) {
+        return memberRepo.sampleByGenerated(Limit.of(rowLimit), reviewLimit);
     }
 
     public UserProfileDto getProfile(String username) {
-        var profileMember = getMember(username);
+        var profileMember = getMemberByUsername(username);
 
         return new UserProfileDto(
             profileMember.getAvatar(),
@@ -58,7 +160,7 @@ public class MemberService {
     }
     
     public void modifyProfile(UserProfileDto profileDto, String username) {
-        var profileMember = getMember(username);
+        var profileMember = getMemberByUsername(username);
 
         profileMember.setAvatar(profileDto.avatar());
         profileMember.setFirstName(profileDto.firstName());
@@ -89,7 +191,7 @@ public class MemberService {
         List<Member> memberList;
         Member principalMember;
 
-        principalMember = principal != null ? getMember(principal.getName()) : null;
+        principalMember = principal != null ? getMemberByUsername(principal.getName()) : null;
 
         if(sortField.equals("reviewCount")) {
             Page<Object[]> memberPage = memberRepo.findAllOrderByReviewCount(sortBy);
@@ -199,5 +301,23 @@ public class MemberService {
         MemberFollowKey memberFollowKey = new MemberFollowKey(principalMember.getId(), member.getId());
 
         memberFollowRepo.deleteById(memberFollowKey);   
+    }
+
+    public class BadUserInputException extends RuntimeException {
+        public BadUserInputException(String msg) {
+            super(msg);
+        }
+    }
+
+    public class UserAlreadyExistsException extends BadUserInputException {
+        public UserAlreadyExistsException() {
+            super("User with given username or email already exists");
+        }
+    }
+
+    public class PasswordNotConfirmedException extends BadUserInputException {
+        public PasswordNotConfirmedException() {
+            super("Passwords do not match");
+        }
     }
 }

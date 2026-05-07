@@ -122,7 +122,8 @@ public class ReviewService {
         Member author,
         Series series,
         PostReviewDto postReview,
-        TimeZone timezone
+        TimeZone timezone,
+        boolean isGenerated
     ) {
         ZoneId tz = timezone.toZoneId();
         var review = new Review(
@@ -132,7 +133,8 @@ public class ReviewService {
             postReview.watchedOn() != null ? postReview.watchedOn().atStartOfDay(tz).toOffsetDateTime() : null,
             postReview.rating(),
             postReview.isSpoiler(),
-            postReview.like()
+            postReview.like(),
+            isGenerated
         );
 
         review = reviewRepo.save(review);

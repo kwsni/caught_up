@@ -21,7 +21,7 @@ public class ScheduledSync {
         this.tvdbUpdateSyncJob = tvdbUpdateSyncJob;
     }
     
-    @Scheduled(cron = "23 50 * * * *")
+    @Scheduled(cron = "23 43 * * * *")
     public void runUpdateSyncJob() throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
             .addDate("date", new Date())
