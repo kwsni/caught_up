@@ -1,6 +1,6 @@
 # Caught Up!
 
-A social website for reviewing TV series.
+A social [website](https://caughtup.kowsun.com) for reviewing TV series.
 
 Built with Spring Boot, Spring MVC, Spring Batch, Spring AI, Thymeleaf, HTMX, Tailwind CSS and PostgreSQL.
 
