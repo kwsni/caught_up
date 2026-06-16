@@ -19,7 +19,7 @@ import com.kwsni.caught_up.tvdb.repository.SeriesRepository;
 @Service
 public class TvdbService {
     private final RestClient tvdbClient;
-    private SeriesRepository seriesRepo;
+    private final SeriesRepository seriesRepo;
 
     public TvdbService(RestClient tvdbClient, SeriesRepository seriesRepo) {
         this.tvdbClient = tvdbClient;

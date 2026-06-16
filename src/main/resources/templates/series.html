@@ -8,18 +8,25 @@
   <body>
     <div layout:fragment="content">
       <div class="flex flex-col my-10">
-        <div class="flex flex-row gap-5">
-          <img th:if="${series.image != null}" th:src="'https://artworks.thetvdb.com' + ${series.image}" class="sticky top-3 w-[230px] h-[338px] object-contain rounded-sm border shadow-lg/50">
-          <div th:unless="${series.image != null}" class="w-[230px] h-[338px] bg-[#1f282f] rounded-sm border shadow-lg/50"></div>
+        <div class="flex flex-row gap-5 items-start">
+          <div class="sticky flex-none top-3 w-[100px] lg:w-[230px] aspect-17/25 object-contain rounded-sm border bg-[#1f282f] shadow-lg/50">
+            <img th:replace="~{fragments/components :: series-poster (${series}, 'XL')}"></img>
+          </div>
           <article class="flex flex-col">
             <section class="flex flex-row items-end gap-3 mb-5">
-              <h1 th:text="${series.name}" class="text-4xl text-white font-bold font-serif">Name</h1> 
+              <h1 th:text="${series.name}" class="text-xl lg:text-4xl text-white font-bold font-serif">Name</h1> 
               <h2 th:text="${series.year}" class="text-[#ddeeff] font-light underline decoration-[#575e68]">Year</h2>
             </section>
-            <section class="flex flex-row mb-5">
+            <section class="flex flex-col lg:flex-row mb-5">
               <p style="white-space: pre-line;" th:utext="${series.overview}" class="font-serif">Overview</p>
-              <div class="ml-3">
-                <form sec:authorize="isAuthenticated()" th:replace="~{post-review :: post-review}"></form>
+              <div class="max-lg:mt-3 lg:ml-3">
+                <a sec:authorize="isAuthenticated()" href="#write-review" class="lg:absolute lg:invisible w-full px-3 py-1 text-nowrap bg-[#00ac1c] hover:bg-[#009d1a] text-white align-center rounded-sm inset-shadow-2xs/30 inset-shadow-white">Write review</a>
+                <div id="write-review" class="fixed top-0 left-0 hidden lg:relative lg:block target:block group/post-review">
+                    <div class="flex w-screen h-screen items-center justify-center bg-[#1f282f]/75 lg:hidden"></div>
+                    <div class="max-lg:fixed max-lg:top-1/2 max-lg:left-1/2 max-lg:-translate-1/2">
+                      <form sec:authorize="isAuthenticated()" th:replace="~{fragments/components :: post-review}"></form>
+                    </div>
+                </div>
                 <div th:if="${reviews.hasContent()}" class="flex flex-col divide-y divide-[#445566] gap-3 pt-5">
                   <h1 class="font-light text-lg text-[#99aabb] text-nowrap">Average rating</h1>
                   <div class="flex flex-row py-1 gap-3">
@@ -58,7 +65,7 @@
                 </div>
                 <div class="flex flex-col gap-5 divide-y divide-[#2c3440]">
                   <div th:each="review : ${reviews}" class="pb-5">
-                    <article th:replace="~{fragments/list-items :: review ('series')}"></article>
+                    <article th:replace="~{fragments/components :: review ('series')}"></article>
                   </div>
                 </div>
               </div>

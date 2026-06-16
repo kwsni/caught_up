@@ -1,62 +1,16 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
-  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+  layout:decorate="~{base}">
   <head>
     <title>Post Review</title>
   </head>
   <body>
-    <form action="#" th:fragment="post-review" th:action="@{/series/{slug}(slug=${series.slug})}" th:object="${postReview}" method="POST" enctype="utf8" >
-      <div class="flex flex-col p-2 rounded-sm bg-[#445566]">
-        <label class="mb-1 font-bold">What did you think?</label>
-        <div class="flex flex-row justify-between mb-2">
-          <div>
-            <label class="mr-1">Watched on</label>
-            <input type="date" id="watchedDate" name="watchedDate" th:field="*{watchedOn}" required/>
-          </div>
-        </div>
-        <textarea id="content" name="content" th:field="*{content}" required rows="5" cols="32" placeholder="Add a review..." class="px-2 py-1 rounded-t-sm bg-[#ccddee] text-[#234] focus:bg-white"></textarea>
-        <div class="mb-2 p-2 rounded-b-sm bg-[#667788]">
-          <input type="checkbox" th:field="*{isSpoiler}"/>
-          <label th:for="isSpoiler" class="ml-1 text-white">Contains spoilers</label>
-        </div>
-        <div class="flex flex-row justify-between mb-7">
-          <div class="flex flex-col">
-            <legend class="mb-1 text-white">Rating</legend>
-            <fieldset class="flex flex-row-reverse justify-end items-start text-4xl font-mono">
-              <input type="radio" name="rating" id="rating5" value="5" required class="peer size-8 cursor-pointer appearance-none"/>
-              <label for="rating5" th:insert="~{fragments/icons :: full-star-ic}" class="pointer-events-none text-[#334455] -ms-4 peer-hover:text-[#40bcf4] peer-checked:text-[#00e054] *:absolute *:pr-0 *:shrink-0 *:size-8"></label>
-              <input type="radio" name="rating" id="rating4.5" value="4.5" required class="peer w-4 h-8 cursor-pointer appearance-none"/>
-              <label for="rating4.5" th:insert="~{fragments/icons :: half-star-ic}" class="pointer-events-none text-[#334455] peer-hover:text-[#40bcf4] peer-checked:text-[#00e054] *:absolute *:pr-0 *:shrink-0 *:size-8"></label>
-              <input type="radio" name="rating" id="rating4" value="4" required class="peer size-8 cursor-pointer appearance-none"/>
-              <label for="rating4" th:insert="~{fragments/icons :: full-star-ic}" class="pointer-events-none text-[#334455] -ms-4 peer-hover:text-[#40bcf4] peer-checked:text-[#00e054] *:absolute *:pr-0 *:shrink-0 *:size-8"></label>
-              <input type="radio" name="rating" id="rating3.5" value="3.5" required class="peer w-4 h-8 cursor-pointer appearance-none"/>
-              <label for="rating3.5" th:insert="~{fragments/icons :: half-star-ic}" class="pointer-events-none text-[#334455] peer-hover:text-[#40bcf4] peer-checked:text-[#00e054] *:absolute *:pr-0 *:shrink-0 *:size-8"></label>
-              <input type="radio" name="rating" id="rating3" value="3" required class="peer size-8 cursor-pointer appearance-none"/>
-              <label for="rating3" th:insert="~{fragments/icons :: full-star-ic}" class="pointer-events-none text-[#334455] -ms-4 peer-hover:text-[#40bcf4] peer-checked:text-[#00e054] *:absolute *:pr-0 *:shrink-0 *:size-8"></label>
-              <input type="radio" name="rating" id="rating2.5" value="2.5" required class="peer w-4 h-8 cursor-pointer appearance-none"/>
-              <label for="rating2.5" th:insert="~{fragments/icons :: half-star-ic}" class="pointer-events-none text-[#334455] peer-hover:text-[#40bcf4] peer-checked:text-[#00e054] *:absolute *:pr-0 *:shrink-0 *:size-8"></label>
-              <input type="radio" name="rating" id="rating2" value="2" required class="peer size-8 cursor-pointer appearance-none"/>
-              <label for="rating2" th:insert="~{fragments/icons :: full-star-ic}" class="pointer-events-none text-[#334455] -ms-4 peer-hover:text-[#40bcf4] peer-checked:text-[#00e054] *:absolute *:pr-0 *:shrink-0 *:size-8"></label>
-              <input type="radio" name="rating" id="rating1.5" value="1.5" required class="peer w-4 h-8 cursor-pointer appearance-none"/>
-              <label for="rating1.5" th:insert="~{fragments/icons :: half-star-ic}" class="pointer-events-none text-[#334455] peer-hover:text-[#40bcf4] peer-checked:text-[#00e054] *:absolute *:pr-0 *:shrink-0 *:size-8"></label>
-              <input type="radio" name="rating" id="rating1" value="1" required class="peer size-8 cursor-pointer appearance-none"/>
-              <label for="rating1" th:insert="~{fragments/icons :: full-star-ic}" class="pointer-events-none text-[#334455] -ms-4 peer-hover:text-[#40bcf4] peer-checked:text-[#00e054] *:absolute *:pr-0 *:shrink-0 *:size-8"></label>
-              <input type="radio" name="rating" id="rating0.5" value="0.5" required class="peer w-4 h-8 cursor-pointer appearance-none"/>
-              <label for="rating0.5" th:insert="~{fragments/icons :: half-star-ic}" class="pointer-events-none text-[#334455] peer-hover:text-[#40bcf4] peer-checked:text-[#00e054] *:absolute *:pr-0 *:shrink-0 *:size-8"></label>
-            </fieldset>
-          </div>
-          <div class="flex flex-col justify-center items-center">
-            <legend class="text-white">Like</legend>
-            <fieldset class="flex">
-              <input type="checkbox" name="like" th:field="*{like}" class="peer size-10 appearance-none cursor-pointer"/>
-              <label class="pointer-events-none -ms-10 text-[#556677] peer-hover:text-[#ff80e8] peer-checked:text-[#ff9010] *:size-10">
-                <svg th:replace="~{fragments/icons :: like-heart-ic}"></svg>
-              </label>
-            </fieldset>
-          </div>
-        </div>
-        <div class="flex flex-row justify-end"><input type="submit" value="Post review" class="bg-[#00ac1c] hover:bg-[#009d1a] active:bg-[#009318] text-white font-mono font-semibold align-center px-3 py-1 rounded-sm inset-shadow-2xs/30 inset-shadow-white"/></div>
+    <div layout:fragment="content">
+      <div class="flex flex-col gap-10">
+        <div id="series-selector" th:insert="~{fragments/components :: series-search-bar (new-review)}"></div>
+        <div id="review-form" class="empty:hidden"></div>
       </div>
-    </form>
+    </div>
   </body>
 </html>

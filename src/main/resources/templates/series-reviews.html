@@ -25,7 +25,7 @@
                 <button class="block text-nowrap text-light text-sm text-[#667788] items-center cursor-pointer active:text-white focus:text-white group-hover/menu:text-white">
                   Rating
                 </button>
-                <ul id="menu" class="invisible absolute right-0 z-50 rounded-sm text-[#2c3440] text-xs group-focus-within/menu:visible group-hover/menu:visible">
+                <ul id="menu" class="invisible absolute right-0 z-30 rounded-sm text-[#2c3440] text-xs group-focus-within/menu:visible group-hover/menu:visible">
                   <li>
                     <a th:href="@{/series/{slug}/reviews(sort=${param.sort}, page=${param.page}, slug=${series.slug})}"
                       class="block bg-[#8899aa] text-nowrap px-2 py-1 hover:bg-[#708090] hover:text-white">
@@ -63,7 +63,7 @@
                 <button class="block text-nowrap text-light text-sm text-[#667788] items-center cursor-pointer active:text-white focus:text-white group-hover/menu:text-white">
                   Sort By
                 </button>
-                <ul id="menu" class="invisible absolute right-0 z-50 rounded-sm text-[#2c3440] text-xs group-focus-within/menu:visible group-hover/menu:visible">
+                <ul id="menu" class="invisible absolute right-0 z-30 rounded-sm text-[#2c3440] text-xs group-focus-within/menu:visible group-hover/menu:visible">
                   <li>
                     <span class="block bg-[#8899aa] text-nowrap px-2 py-1">
                       When Reviewed
@@ -96,7 +96,7 @@
           </div>
           <div class="flex flex-col gap-5 divide-y divide-[#2c3440]">
             <div th:each="review : ${reviews}" class="pb-5">
-              <article th:replace="~{fragments/list-items :: review (series)}"></article>
+              <article th:replace="~{fragments/components :: review (series)}"></article>
             </div>
           </div>
           <div class="flex flex-row justify-between pb-10 *:only:ml-auto">

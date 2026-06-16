@@ -44,6 +44,10 @@ public class SeriesService {
 
     }
 
+    public List<Series> searchSeries(String query) {
+        return seriesRepo.findBySearchQuery(query);
+    }
+
     public Optional<Series> getSeries(String slug) {
         return seriesRepo.findBySlug(slug);
     }

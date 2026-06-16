@@ -22,14 +22,24 @@ import com.kwsni.caught_up.tvdb.dto.TvdbLoginResponseDto;
 @Configuration
 public class TvdbConfig {
     private static final Logger logger = LoggerFactory.getLogger(TvdbConfig.class);
-    private RedisTemplate<String, String> redisTemplate;
+    
+    private final String baseUrl;
+    private final String apiKey;
+    private final RedisTemplate<String, String> redisTemplate;
+    
 
-    TvdbConfig(RedisTemplate<String, String> redisTemplate) {
+    TvdbConfig(
+        @Value("${tvdb.api.base_url}") String baseUrl,
+        @Value("${tvdb.api.api_key}") String apiKey,
+        RedisTemplate<String, String> redisTemplate
+    ) {
+        this.baseUrl = baseUrl;
+        this.apiKey = apiKey;
         this.redisTemplate = redisTemplate;
     }
 
     @Bean
-    RestClient tvdbClient(@Value("${tvdb.api.base_url}") String baseUrl, @Value("${tvdb.api.api_key}") String apiKey) {
+    RestClient tvdbClient() {
         return RestClient.builder()
             .baseUrl(baseUrl)
             .requestFactory(ClientHttpRequestFactoryBuilder

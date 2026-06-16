@@ -18,14 +18,14 @@ import com.kwsni.caught_up.tvdb.service.SeriesService;
 
 @Component
 public class ScheduledGeneration {
-    private final int NUM_MEMBERS_TO_GENERATE = 5;  // 5 members per day
-    private final int NUM_REVIEWS_TO_GENERATE = 10; // 10 reviews overall per day
+    private final int NUM_MEMBERS_TO_GENERATE = 1;  // 1 member every 6 hours
+    private final int NUM_REVIEWS_TO_GENERATE = 2; // 2 reviews every 6 hours
     private final int MAX_REVIEWS_PER_MEMBER = 10; // Up to 10 reviews per generated member
-    private ReviewGenerationService reviewGenSvc;
-    private MemberGenerationService memberGenSvc;
-    private ReviewService reviewSvc;
-    private MemberService memberSvc;
-    private SeriesService seriesSvc;
+    private final ReviewGenerationService reviewGenSvc;
+    private final MemberGenerationService memberGenSvc;
+    private final ReviewService reviewSvc;
+    private final MemberService memberSvc;
+    private final SeriesService seriesSvc;
 
     public ScheduledGeneration(
         ReviewGenerationService reviewGenSvc,
@@ -43,14 +43,14 @@ public class ScheduledGeneration {
 
     /*
 
-    Generate 5 members
+    Generate members
 
-    Pick random generated member with uniform distribution given that they are below review quota (10 per member)
-    Pick random series to review with non-uniform distribution weighed by score property (Alias method? Weighed treemap?)
-    Then generate review and save, repeat 10 times
+    Pick random generated member with uniform distribution given that they are below review quota
+    Pick random series to review with non-uniform distribution weighed by score property
+    Then generate review and save, repeat
     
     */
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 0,6,12,18 * * *")
     public void generateMemberReviews() {
         // Generate members
         for(int i = 0; i < NUM_MEMBERS_TO_GENERATE; i++) {

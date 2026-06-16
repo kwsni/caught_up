@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.kwsni.caught_up.social.controller.dto.PostReviewDto;
+import com.kwsni.caught_up.social.controller.dto.SearchDto;
 import com.kwsni.caught_up.social.model.Member;
 import com.kwsni.caught_up.social.model.Review;
 import com.kwsni.caught_up.social.service.MemberService;
@@ -46,9 +47,11 @@ public class SeriesController {
     public String homeSeries(Model model) {
         var popularSeries = seriesSvc.getPopularSeries();
         var justReviewed = reviewSvc.getRecentReviews();
+        var searchForm = new SearchDto("", 0, 16);
         
         model.addAttribute("popularSeries", popularSeries);
         model.addAttribute("justReviewed", justReviewed);
+        model.addAttribute("searchForm", searchForm);
 
         return "series-home";
     }
@@ -70,6 +73,20 @@ public class SeriesController {
         model.addAttribute("hasNext", seriesPage.hasNext());
 
         return "series-list";
+    }
+
+    @PostMapping("/search")
+    public String searchSeries(
+        @RequestParam String query,
+        @RequestParam(defaultValue="series-search") String searchType,
+        Model model
+    ) {
+        var seriesList = seriesSvc.searchSeries(query);
+
+        model.addAttribute("seriesList", seriesList);
+        model.addAttribute("searchType", searchType);
+        
+        return "fragments/components :: series-search-item";
     }
 
     @GetMapping("/{slug}")

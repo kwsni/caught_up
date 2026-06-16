@@ -22,7 +22,7 @@ public class ReviewGenerationService {
     public PostReviewDto generateReview(Member member, Series series) {
         return chatClient.prompt()
             .advisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
-            .user(u -> u.text("You are a user named " + member.getUsername() + ". Write a review of the TV series " + series.getName() + "(" + series.getYear() + ") in the style of a typical Letterboxd review. Give a rating and/or a like appropriate for the written content, and flag for spoilers if necessary. Make sure the review is dated on or before the current date.")
+            .user(u -> u.text("You are a user named " + member.getUsername() + ". Write a review of the TV series " + series.getName() + " first aired in the year " + series.getYear() + " in the style of a typical Letterboxd review. Give a rating and/or a like appropriate for the written content, and flag for spoilers if necessary. Make sure the review is dated on or before the current date.")
                 .metadata("userId", member.getId()))
             .call()
             .entity(PostReviewDto.class);

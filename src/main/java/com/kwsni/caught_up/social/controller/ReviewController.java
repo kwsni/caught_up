@@ -1,6 +1,7 @@
 package com.kwsni.caught_up.social.controller;
 
 import java.security.Principal;
+import java.time.LocalDate;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,9 +14,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.context.request.WebRequest;
 
 import com.kwsni.caught_up.social.controller.dto.PostCommentDto;
+import com.kwsni.caught_up.social.controller.dto.PostReviewDto;
 import com.kwsni.caught_up.social.model.Member;
 import com.kwsni.caught_up.social.service.MemberService;
 import com.kwsni.caught_up.social.service.ReviewService;
@@ -38,10 +39,11 @@ public class ReviewController {
     @GetMapping
     public String listReviews(
         @RequestParam(defaultValue="createdDate,desc") String[] sort,
+        @RequestParam(required=false) Double rating,
         @RequestParam(defaultValue="0") int page,
         Model model
     ) {
-        var reviewList = reviewSvc.getReviewList(sort, page);
+        var reviewList = reviewSvc.getReviewList(sort, rating, page);
 
         model.addAttribute("reviews", reviewList.getContent());
         model.addAttribute("prevPage", page - 1);
@@ -52,9 +54,26 @@ public class ReviewController {
         return "review-list";
     }
     
-    @GetMapping("/post")
-    public String showPostReview(WebRequest request, Model model) {
+    @GetMapping("/new")
+    public String logReview(Model model) {
         return "post-review";
+    }
+
+    @GetMapping("/new/form")
+    public String reviewForm(
+        @RequestParam String series,
+        Model model
+    ) {
+        model.addAttribute("postReview", new PostReviewDto(
+            "",
+            LocalDate.now(),
+            0.0,
+            false,
+            false
+        ));
+        model.addAttribute("slug", series);
+        
+        return "fragments/components :: post-review";
     }
 
     @GetMapping("/{reviewId}")

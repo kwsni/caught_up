@@ -9,7 +9,7 @@
   <body>
     <div layout:fragment="content">
       <section>
-        <div class="flex flex-col w-[715px] divide-y divide-[#445566] gap-3 pt-5">
+        <div class="flex flex-col lg:w-[715px] divide-y divide-[#445566] gap-3 pt-5">
           <div class="flex flex-row pb-1 justify-between items-end">
             <h1>Members</h1>
             <div class="flex flex-row gap-3 items-end">
@@ -17,7 +17,7 @@
                 <button class="block text-nowrap text-light text-sm text-[#667788] items-center cursor-pointer active:text-white focus:text-white group-hover/menu:text-white">
                   Sort By
                 </button>
-                <ul id="menu" class="invisible absolute right-0 z-50 rounded-sm text-[#2c3440] text-xs group-focus-within/menu:visible group-hover/menu:visible">
+                <ul id="menu" class="invisible absolute right-0 z-30 rounded-sm text-[#2c3440] text-xs group-focus-within/menu:visible group-hover/menu:visible">
                   <li>
                     <span class="block bg-[#8899aa] text-nowrap px-2 py-1">
                       Films Reviewed
@@ -50,7 +50,7 @@
           </div>
           <div class="flex flex-col divide-y gap-3 divide-[#2c3440]">
             <div th:each="member : ${members}" class="pb-3">
-              <article th:replace="~{fragments/list-items :: member}"></article>
+              <article th:replace="~{fragments/components :: member}"></article>
             </div>
           </div>
           <div class="flex flex-row justify-between pb-10 *:only:ml-auto">

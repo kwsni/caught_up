@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{base}">
+  <head>
+    <title>Account Settings</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <h1 class="pt-5 font-light text-3xl text-[#99aabb]">Account Settings</h1>
+      <div class="flex flex-col divide-y divide-[#445566] gap-3 pt-5">
+        <div class="flex flex-row py-1 justify-between items-end">
+          <div class="flex flex-row py-1 gap-4 items-end">
+            <a th:href="@{/settings/profile}">
+              <h2 class="font-mono uppercase text-sm text-[#00e054] hover:text-[#009d1a]">Profile</h2>
+            </a>
+            <a th:href="@{/settings/password}">
+              <h2 class="font-mono uppercase text-sm text-[#00e054] hover:text-[#009d1a]">Auth</h2>
+            </a>
+            <a th:href="@{/settings/avatar}">
+              <h2 class="font-mono uppercase text-sm text-white">Avatar</h2>
+            </a>
+          </div>
+        </div>
+        <div id="settings-tab" th:fragment="avatar-form" class="flex flex-col gap-5 divide-y divide-[#2c3440]">
+          <form th:action="@{/settings/avatar}" method="POST" enctype="multipart/form-data">
+            <label for="avatarFile" class="text-sm text-white mb-1">Avatar</label>
+            <div class="flex flex-row gap-5">
+              <img th:if="${#authentication.principal.user.avatar != null}" class="w-24 h-24 rounded-full mb-3" th:with="imgUrl=${@cloudinaryService.transformAvatar(#authentication.principal.user.username, #authentication.principal.user.avatar, 'LG')}" th:src="${imgUrl}">
+              <div th:unless="${#authentication.principal.user.avatar != null}" class="w-24 h-24 bg-[#667788] rounded-full"></div>
+              <div class="">
+                <label for="avatarFile" class="block px-4 py-2 text-nowrap lg:uppercase lg:font-mono lg:font-bold bg-[#ff9010] hover:bg-[#40bcf4] text-white lg:align-center lg:px-3 lg:py-1 lg:rounded-sm lg:inset-shadow-2xs/30 lg:inset-shadow-white">
+                  <span>Change Avatar</span>
+                  <input id="avatarFile" name="avatarFile" type="file" accept="image/*" hidden/>
+                </label>
+              </div>
+            </div>
+            <input type="submit" value="UPLOAD" class="px-3 py-1 font-mono font-bold rounded-sm cursor-pointer transition duration-150 bg-[#00ac1c] hover:bg-[#009d1a] text-white inset-shadow-2xs/30 inset-shadow-white"/>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{base}">
+  <head>
+    <title>About Caught Up!</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <div class="mt-10">
+        <article th:fragment="disclaimer">
+          <h1 class="mb-4 text-2xl font-semibold">Legal Notice & Disclaimer</h1>
+          <h2 class="mb-1 text-xl">1. Purpose of the Site</h2>
+          <p class="mb-2">This website is a personal project created solely for demonstration, testing, and portfolio purposes. It does not represent a live business or commercial service.</p>
+          <h2 class="mb-1 text-xl">2. User Data Notice</h2>
+          <p class="mb-2"><span class="text-[#ee7000] font-bold">Please do not enter real or sensitive personal information into any forms on this website.</span> Data entered here is for testing purposes only and may be deleted at any time.</p>
+          <h2 class="mb-1 text-xl">3. No Warranties and Liability</h2>
+          <p class="mb-2">This website is provided "as-is" and may contain placeholder content or technical bugs. The developer assumes no liability for any errors, omissions, or outcomes resulting from the use of this simulated environment.</p>
+        </article>
+      </div>
+    </div>
+  </body>
+</html>

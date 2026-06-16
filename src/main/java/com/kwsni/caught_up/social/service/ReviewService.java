@@ -32,14 +32,18 @@ public class ReviewService {
         this.reviewCommentRepo = reviewCommentRepo;
     }
 
-    public Page<Review> getReviewList(String[] sort, int page) {
+    public Page<Review> getReviewList(String[] sort, Double rating, int page) {
         String sortField = sort[0];
         String sortDir = sort[1];
 
         Direction dir = sortDir.equals("desc") ? Direction.DESC : Direction.ASC;
         Pageable sortBy = PageRequest.of(page, 18, Sort.by(Sort.Order.by(sortField).with(dir).nullsLast()));
-        
-        return reviewRepo.findAll(sortBy);
+
+        if(rating != null) {
+            return reviewRepo.findByRating(rating, sortBy);
+        } else {
+            return reviewRepo.findAll(sortBy);
+        }
     }
 
     public Page<Review> getSeriesReviewList(

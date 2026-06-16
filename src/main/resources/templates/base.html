@@ -5,15 +5,24 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title layout:title-pattern="$CONTENT_TITLE | $LAYOUT_TITLE">Caught up!</title>
+    <script src="/webjars/htmx.org/4.0.0-beta3/dist/htmx.min.js"></script>
     <link th:href="@{/styles/style.css}" rel="stylesheet">
   </head>
-  <body class="flex flex-col min-h-dvh font-sans text-[#aabbcc] z-0">
+  <body class="flex flex-col min-h-dvh font-sans bg-[#14181c] text-[#aabbcc] z-0">
     <header class="w-full bg-[#14181c]">
-      <nav th:replace="(~{navbar :: navbar})"></nav>
+      <div class="w-full py-4 max-lg:px-2 mx-auto lg:w-[950px] text-[#aabbcc]">
+        <ul class="flex flex-row w-full justify-between items-center gap-3">
+          <li><a th:href="@{/}" class="text-left text-2xl text-nowrap font-mono lg:text-4xl">Caught Up!</a></li>
+          <li><nav th:replace="(~{navbar :: navbar})"></nav></li>
+        </ul>
+      </div>
     </header>
     <main class="flex-1 bg-[#14181c] z-1">
-      <div class="absolute w-full aspect-video bg-linear-to-b from-[#1e252c] to-[#14181c] to-30% z-2"></div>
+      <div class="absolute w-full h-auto max-h-[calc(100dvh-144px)] aspect-video bg-linear-to-b from-[#1e252c] to-[#14181c] to-30% z-2"></div>
       <div layout:fragment="content" class="relative w-[93%] lg:w-[950px] mx-auto z-10"></div>
     </main>
+    <footer class="w-full mt-10 bg-[#1e252c]">
+      <div th:replace="(~{footer :: footer})"></div>
+    </footer>
   </body>
 </html>

@@ -15,7 +15,7 @@
               <button class="block text-nowrap text-light text-sm text-[#667788] cursor-pointer active:text-white group-hover/menu:text-white">
                 Sort by
               </button>
-              <ul id="menu" class="invisible absolute right-0 z-50 text-[#2c3440] text-xs group-hover/menu:visible">
+              <ul id="menu" class="invisible absolute right-0 z-30 text-[#2c3440] text-xs group-hover/menu:visible group-focus-within/menu:visible">
                 <li><a th:href="@{/series/browse(sort='score,desc', size=${param.size}, page=${param.page})}"
                   class="block bg-[#8899aa] text-nowrap px-2 py-1 hover:bg-[#708090] hover:text-white active:bg-gray-900">
                   Popularity
@@ -74,7 +74,7 @@
                 </li>
               </ul>
             </div>
-            <div class="inline-block">
+            <div class="lg:inline-block hidden">
               <a th:if="${isLarge}" th:href="@{/series/browse(sort=${param.sort}, size=sm, page=${param.page})}" class="align-bottom text-light text-sm text-[#667788] hover:text-[#99aabb]">Resize posters</a>
               <a th:unless="${isLarge}" th:href="@{/series/browse(sort=${param.sort}, size=lg, page=${param.page})}" class="align-bottom text-light text-sm text-[#667788] hover:text-[#99aabb]">Resize posters</a>
             </div>
@@ -83,11 +83,11 @@
         <div class="pb-3">
           <ul class="grid gap-3 grid-cols-4" th:classappend="${isLarge} ? 'lg:grid-cols-6' : 'lg:grid-cols-12'">
             <li th:each="series : ${seriesList}" class="relative rounded-sm shadow-lg/50">
-              <img th:if="${series.image != null}"th:src="'https://artworks.thetvdb.com' + ${series.image}" class="relative object-contain rounded-sm z-20">
+              <img th:if="${series.image != null}" th:with="imgUrl=${@cloudinaryService.fetchPoster('https://artworks.thetvdb.com' + series.image, 'LG')}" th:src="${imgUrl}" class="relative object-contain rounded-sm z-20">
               <div th:unless="${series.image != null}" class="relative grid rounded-sm z-20 h-full place-items-center text-center bg-[#1f282f]">
                 <span th:text="${series.name}">No image available</span>
               </div>
-              <a th:href="@{/series/{slug}(slug=${series.slug})}" class="absolute top-0 left-0 right-0 h-full rounded-sm border transition duration-150 hover:border-[#00e054] hover:inset-ring-3 hover:inset-ring-[#00e054] z-30"></a>
+              <a th:href="@{/series/{slug}(slug=${series.slug})}" class="absolute top-0 left-0 right-0 h-full rounded-sm border transition duration-150 hover:border-[#00e054] hover:inset-ring-3 hover:inset-ring-[#00e054] z-21"></a>
             </li>
           </ul>
         </div>

@@ -9,7 +9,7 @@ import net.datafaker.Faker;
 
 @Service
 public class MemberGenerationService {
-    private Faker faker;
+    private final Faker faker;
 
     public MemberGenerationService() {
         this.faker = new Faker();
@@ -28,7 +28,6 @@ public class MemberGenerationService {
 
     public UserProfileDto generateProfile() {
         return new UserProfileDto(
-            null,
             faker.name().firstName(),
             faker.name().lastName(),
             null,

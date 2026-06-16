@@ -10,9 +10,9 @@
 	</parent>
 	<groupId>com.kwsni</groupId>
 	<artifactId>caught_up</artifactId>
-	<version>1.0.2</version>
+	<version>1.1.0</version>
 	<name>caught_up</name>
-	<description>Social website for TV series logging and reviews</description>
+	<description>Social website for reviewing TV series</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -32,6 +32,11 @@
 		<spring-ai.version>2.0.0-M5</spring-ai.version>
 	</properties>
 	<dependencies>
+		<dependency>
+			<groupId>com.cloudinary</groupId>
+			<artifactId>cloudinary-http5</artifactId>
+			<version>2.3.2</version>
+		</dependency>
 		<dependency>
 			<groupId>net.datafaker</groupId>
 			<artifactId>datafaker</artifactId>
@@ -111,6 +116,11 @@
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-java8time</artifactId>
 			<version>3.0.4.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars.npm</groupId>
+			<artifactId>htmx.org</artifactId>
+			<version>4.0.0-beta3</version>
 		</dependency>
 
 		<dependency>
@@ -193,6 +203,13 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<mainClass>com.kwsni.caught_up.CaughtUpApplication</mainClass>
+					<image>
+						<name>${project.artifactId}-web:${project.version}</name>
+						<env>
+							<BP_JVM_VERSION>25</BP_JVM_VERSION>
+						</env>
+						<createdDate>${maven.build.timestamp}</createdDate>
+					</image>
 				</configuration>
 				<executions>
 					<execution>

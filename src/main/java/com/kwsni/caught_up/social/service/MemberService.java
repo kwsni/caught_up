@@ -1,6 +1,7 @@
 package com.kwsni.caught_up.social.service;
 
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +18,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.cloudinary.EagerTransformation;
+import com.cloudinary.utils.ObjectUtils;
 import com.kwsni.caught_up.social.controller.dto.ChangePasswordDto;
 import com.kwsni.caught_up.social.controller.dto.UserProfileDto;
 import com.kwsni.caught_up.social.controller.dto.UserRegistrationDto;
@@ -31,23 +35,27 @@ import com.kwsni.caught_up.social.repository.MemberRepository;
 import com.kwsni.caught_up.social.service.dto.MemberListDto;
 import com.kwsni.caught_up.social.service.dto.MemberProfileDto;
 import com.kwsni.caught_up.social.service.dto.MemberReviewsDto;
+import com.kwsni.caught_up.tvdb.service.CloudinaryService;
 
 @Service
 public class MemberService implements UserDetailsService {
     private final MemberRepository memberRepo;
     private final MemberFollowRepository memberFollowRepo;
     private final ReviewService reviewSvc;
+    private final CloudinaryService cloudinarySvc;
     private final PasswordEncoder pwdEncoder;
 
     public MemberService(
         MemberRepository memberRepo,
         MemberFollowRepository memberFollowRepo,
         ReviewService reviewSvc,
+        CloudinaryService cloudinarySvc,
         PasswordEncoder pwdEncoder
     ) {
         this.memberRepo = memberRepo;
         this.memberFollowRepo = memberFollowRepo;
         this.reviewSvc = reviewSvc;
+        this.cloudinarySvc = cloudinarySvc;
         this.pwdEncoder = pwdEncoder;
     }
 
@@ -100,7 +108,7 @@ public class MemberService implements UserDetailsService {
             "user",
             isGenerated
         );
-        memberRepo.save(newMember);
+        memberRepo.saveAndFlush(newMember);
     }
 
     public void updatePassword(
@@ -149,7 +157,6 @@ public class MemberService implements UserDetailsService {
         var profileMember = getMemberByUsername(username);
 
         return new UserProfileDto(
-            profileMember.getAvatar(),
             profileMember.getFirstName(),
             profileMember.getLastName(),
             profileMember.getBio(),
@@ -162,7 +169,6 @@ public class MemberService implements UserDetailsService {
     public void modifyProfile(UserProfileDto profileDto, String username) {
         var profileMember = getMemberByUsername(username);
 
-        profileMember.setAvatar(profileDto.avatar());
         profileMember.setFirstName(profileDto.firstName());
         profileMember.setLastName(profileDto.lastName());
         profileMember.setBio(profileDto.bio());
@@ -171,6 +177,34 @@ public class MemberService implements UserDetailsService {
             .replace("http://", "")
             .replace("https://", "")
         );
+
+        memberRepo.save(profileMember);
+    }
+
+    public void changeAvatar(
+        MultipartFile avatarFile,
+        String username
+    ) {
+        var profileMember = getMemberByUsername(username);
+
+        String avatarVersion = cloudinarySvc.uploadImage(
+            avatarFile,
+            username,
+            ObjectUtils.asMap(
+                "folder", "/avatars/",
+                "public_id", username,
+                "overwrite", true,
+                "invalidate", true,
+                "eager", Arrays.asList(
+                    new EagerTransformation().named("avatar-SM"),
+                    new EagerTransformation().named("avatar-MD"),
+                    new EagerTransformation().named("avatar-LG")
+                        
+                )
+            )
+        );
+
+        profileMember.setAvatar(avatarVersion);
 
         memberRepo.save(profileMember);
     }
@@ -277,6 +311,15 @@ public class MemberService implements UserDetailsService {
             reviewsList.hasPrevious(),
             reviewsList.hasNext()
         );
+    }
+
+    public boolean isFollowing(String followerUsername, String targetUsername) {
+        Member followerMember = memberRepo.findByUsername(followerUsername);
+        Member target = memberRepo.findByUsername(targetUsername);
+
+        MemberFollow mf = new MemberFollow(followerMember, target);
+
+        return followerMember.getMembersFollowed().contains(mf);
     }
 
     public void followMember(

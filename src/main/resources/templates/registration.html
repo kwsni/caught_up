@@ -7,6 +7,15 @@
   </head>
   <body>
     <div layout:fragment="content">
+      <div id="acknowledge" class="fixed top-0 left-0 target:hidden group/acknowledge z-3">
+        <div class="w-screen h-screen items-center justify-center z-20 bg-[#1f282f]/75"></div>
+        <div class="fixed top-1/2 left-1/2 -translate-1/2 w-full lg:max-w-[950px] max-w-9/10">
+          <div class="flex flex-col p-2 rounded-sm bg-[#445566]">
+            <div th:replace="~{legal :: disclaimer}"></div>
+            <a href="#acknowledge" class="bg-[#00ac1c] hover:bg-[#009d1a] active:bg-[#009318] text-white font-mono font-semibold align-center px-3 py-1 rounded-sm inset-shadow-2xs/30 inset-shadow-white">Accept</a>
+          </div>
+        </div>
+      </div>
       <div class="flex flex-col items-center">
         <div class="flex flex-col pt-5 mt-10 rounded-lg bg-[#445566]">
           <div class="grid p-5 gap-5">

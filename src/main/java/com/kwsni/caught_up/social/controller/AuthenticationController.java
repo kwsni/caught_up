@@ -9,6 +9,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.kwsni.caught_up.social.controller.dto.ChangePasswordDto;
 import com.kwsni.caught_up.social.controller.dto.UserProfileDto;
@@ -65,9 +67,9 @@ public class AuthenticationController {
             return "registration";
         }
     }
-    
-    @GetMapping("/settings")
-    public String accountSettings(
+
+    @GetMapping("/settings/profile")
+    public String profileSettings(
         Model model,
         Principal principal
     ) {
@@ -75,10 +77,23 @@ public class AuthenticationController {
         var profileDto = memberSvc.getProfile(username);
 
         model.addAttribute("profileDto", profileDto);
-        return "settings";
+        return "settings-profile";
+    }
+    
+    @GetMapping("/settings/password")
+    public String passwordPage(Model model) {
+        var passwordDto = memberSvc.createPasswordForm();
+
+        model.addAttribute("passwordDto", passwordDto);
+        return "settings-password";
     }
 
-    @PostMapping("/settings")
+    @GetMapping("/settings/avatar")
+    public String avatarSettings() {
+        return "settings-avatar";
+    }
+
+    @PostMapping("/settings/profile")
     public String changeAccountSettings(
         @ModelAttribute UserProfileDto profileDto,
         Principal principal
@@ -87,14 +102,6 @@ public class AuthenticationController {
 
         memberSvc.modifyProfile(profileDto, username);
         return "redirect:/members/" + username;
-    }
-    
-    @GetMapping("/settings/password")
-    public String passwordPage(Model model) {
-        var passwordDto = memberSvc.createPasswordForm();
-
-        model.addAttribute("passwordDto", passwordDto);
-        return "password";
     }
 
     @PostMapping("/settings/password")
@@ -122,4 +129,15 @@ public class AuthenticationController {
             return "password";
         }
     }
+
+    @PostMapping("/settings/avatar")
+    public String changeAvatar(
+        @RequestParam MultipartFile avatarFile,
+        Principal principal
+    ) {
+        var username = principal.getName();
+        memberSvc.changeAvatar(avatarFile, username);
+        return "redirect:/members/" + username;
+    }
+
 }

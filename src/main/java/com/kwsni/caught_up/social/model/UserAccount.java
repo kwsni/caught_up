@@ -49,4 +49,7 @@ public class UserAccount implements UserDetails, CredentialsContainer {
         return user.getUsername().hashCode();
     }
     
+    public Member getUser() {
+        return this.user;
+    }
 }

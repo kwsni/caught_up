@@ -9,20 +9,21 @@
   <body>
     <div layout:fragment="content">
       <div class="flex flex-col my-5">
-        <div class="flex flex-row justify-between">
+        <div class="flex flex-col gap-5 lg:flex-row justify-between">
           <div class="flex flex-row gap-5">
-            <img th:if="${member.avatar != null}" class="w-24 h-24 rounded-full" th:href="${member.avatar}">
-            <div th:unless="${member.avatar != null}" class="w-24 h-24 bg-[#667788] rounded-full"></div>
+            <div class="w-24 h-24 bg-[#667788] rounded-full">
+              <img th:if="${member.avatar != null}" th:with="imgUrl=${@cloudinaryService.transformAvatar(member.username, member.avatar, 'LG')}" th:src="${imgUrl}" class="w-24 h-24 rounded-full">
+            </div>
             <div class="flex flex-col justify-center gap-2">
               <div class="flex flex-row gap-5">
                 <h1 th:text="${member.username}" class="text-xl font-bold text-white">Profile</h1>
-                <a sec:authorize="isAuthenticated()" th:if="${#authentication.name == member.username}" th:href="@{/settings}" class="px-2 py-1 rounded-sm text-sm font-mono font-bold bg-[#556677] text-[#c8d4e0] inset-shadow-2xs/30 inset-shadow-white hover:text-white hover:bg-[#667788]">EDIT PROFILE</a>
-                <form sec:authorize="isAuthenticated()" th:unless="${#authentication.name == member.username}" th:action="@{/members/{username}/unfollow(username=${member.username})}" method="POST" class="flex flex-row gap-3">
-                  <div><input th:if="${isFollowing}" th:formaction="@{/members/{username}/unfollow(username=${member.username})}" type="submit" value="UNFOLLOW" class="px-2 py-1 rounded-sm text-sm font-mono font-bold bg-[#556677] text-[#c8d4e0] inset-shadow-2xs/30 inset-shadow-white hover:text-white hover:bg-[#667788]"/></div>
-                  <div><input th:unless="${isFollowing}" th:formaction="@{/members/{username}/follow(username=${member.username})}" type="submit"value="FOLLOW" class="px-2 py-1 rounded-sm text-sm font-mono font-bold bg-[#556677] text-[#c8d4e0] inset-shadow-2xs/30 inset-shadow-white hover:text-white hover:bg-[#667788]"/></div>
-                  <span th:if="${isFollowed}">Follows you</span>
-                </form>
               </div>
+              <div><a sec:authorize="isAuthenticated()" th:if="${#authentication.name == member.username}" th:href="@{/settings/profile}" class="px-2 py-1 rounded-sm text-sm font-mono font-bold text-nowrap bg-[#556677] text-[#c8d4e0] inset-shadow-2xs/30 inset-shadow-white hover:text-white hover:bg-[#667788]">EDIT PROFILE</a></div>
+              <form sec:authorize="isAuthenticated()" th:unless="${#authentication.name == member.username}" th:action="@{/members/{username}/unfollow(username=${member.username})}" method="POST" class="flex flex-row gap-3">
+                <input th:if="${isFollowing}" th:formaction="@{/members/{username}/unfollow(username=${member.username})}" type="submit" value="UNFOLLOW" class="px-2 py-1 rounded-sm text-sm font-mono font-bold bg-[#556677] text-[#c8d4e0] inset-shadow-2xs/30 inset-shadow-white hover:text-white hover:bg-[#667788]"/>
+                <input th:unless="${isFollowing}" th:formaction="@{/members/{username}/follow(username=${member.username})}" type="submit"value="FOLLOW" class="px-2 py-1 rounded-sm text-sm font-mono font-bold bg-[#556677] text-[#c8d4e0] inset-shadow-2xs/30 inset-shadow-white hover:text-white hover:bg-[#667788]"/>
+                <span th:if="${isFollowed}">Follows you</span>
+              </form>
               <div th:if="${not #strings.isEmpty(member.bio) and #strings.length(member.bio) le 100}" class="flex flex-col divide-y divide-[#445566] gap-3 text-sm text-[#99aabb]">
                 <p th:text="${member.bio}">Bio content</p>
               </div>
@@ -57,7 +58,7 @@
             </div>
           </div>
         </div>
-        <div class="grid grid-cols-[630px_250px] gap-[70px]">
+        <div class="flex flex-col-reverse lg:grid lg:grid-cols-[630px_250px] lg:gap-[70px]">
           <div class="flex flex-col">
             <section>
               <div th:if="${recentReviews.hasContent()}" class="flex flex-col divide-y divide-[#445566] gap-3 pt-5">
@@ -67,7 +68,7 @@
                 </div>
                 <div th:fragment="reviews" class="flex flex-col gap-5 divide-y divide-[#2c3440]">
                   <div th:each="review : ${recentReviews}" class="pb-5">
-                    <article th:replace="~{fragments/list-items :: review ('member')}"></article>
+                    <article th:replace="~{fragments/components :: review ('member')}"></article>
                   </div>
                 </div>
               </div>
@@ -80,7 +81,7 @@
                 </div>
                 <div class="flex flex-col gap-5 divide-y divide-[#2c3440]">
                   <div th:each="review : ${popularReviews}" class="pb-5">
-                    <article th:replace="~{fragments/list-items :: review ('member')}"></article>
+                    <article th:replace="~{fragments/components :: review ('member')}"></article>
                   </div>
                 </div>
               </div>
@@ -88,7 +89,7 @@
           </div>
           <div class="flex flex-col">
             <div th:if="${not #strings.isEmpty(member.bio) and #strings.length(member.bio) > 100}" class="flex flex-col divide-y divide-[#445566] gap-3 pt-5">
-              <div class="flex flex-row py-1 justify-between items-end">
+              <div class="max-lg:hidden flex flex-row py-1 justify-between items-end">
                 <h1 class="font-light text-lg text-[#99aabb]">Bio</h1>
               </div>
               <p th:text="${member.bio}">Bio content</p>

@@ -16,7 +16,7 @@ public class WebSecurityConfig {
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    String[] authenticatedPaths = {"/settings", "/**/follow", "/**/unfollow", "/**/like", "/**/unlike"};
+    String[] authenticatedPaths = {"/settings", "/settings/**", "/**/follow", "/**/unfollow", "/**/like", "/**/unlike", "/reviews/new", "/reviews/new/**"};
     http
       .authorizeHttpRequests((requests) -> requests
         .requestMatchers(authenticatedPaths).authenticated()

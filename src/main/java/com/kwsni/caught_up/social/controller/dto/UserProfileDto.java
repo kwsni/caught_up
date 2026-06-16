@@ -5,7 +5,6 @@ import org.hibernate.validator.constraints.URL;
 import com.kwsni.caught_up.social.model.Pronoun;
 
 public record UserProfileDto(
-    String avatar,
     String firstName,
     String lastName,
     String bio,

@@ -7,4 +7,5 @@
     <include file="src/main/resources/db/changelog/001-initial_changelog.postgresql.sql"/>
     <include file="src/main/resources/db/changelog/002-denormalize_member.postgresql.sql"/>
     <include file="src/main/resources/db/changelog/003-fix_deploy.postgresql.sql"/>
+    <include file="src/main/resources/db/changelog/004-add_search_vector.postgresql.sql"/>
 </databaseChangeLog>

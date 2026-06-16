@@ -7,34 +7,36 @@
   </head>
   <body>
     <div layout:fragment="content">
+      <div th:replace="~{fragments/components :: series-search-bar (series-home)}"></div>
       <div class="flex flex-col divide-y divide-[#445566] gap-3 pt-5">
         <div class="flex flex-row py-1 justify-between items-end">
           <h1 class="font-light text-lg text-[#99aabb]">Popular Series</h1>
           <a th:href="@{/series/browse}" class="text-light text-sm text-[#667788] hover:text-[#40bcf4]">Browse</a>
         </div>
-        <div class="flex flex-row gap-3">
-          <ul class="flex flex-row gap-3">
-            <li th:each="series : ${popularSeries}" class="relative rounded-sm shadow-lg/50">
-              <img th:src="'https://artworks.thetvdb.com' + ${series.image}" class="relative object-contain rounded-sm z-20">
-              <a th:href="@{/series/{slug}(slug=${series.slug})}" class="absolute top-0 left-0 right-0 h-full rounded-sm border transition duration-150 hover:border-[#00e054] hover:inset-ring-3 hover:inset-ring-[#00e054] z-30"></a>
-            </li>
-          </ul>
-        </div>
+        <ul class="flex flex-row gap-3">
+          <li th:each="series : ${popularSeries}" th:with="imgUrl=${@cloudinaryService.fetchPoster('https://artworks.thetvdb.com' + series.image, 'XL')}" class="relative rounded-sm shadow-lg/50">
+            <img th:src="${imgUrl}" class="object-contain rounded-sm z-20">
+            <div th:if="${series.image == null}" class="grid lg:w-[228px] lg:aspect-17/25 place-items-center text-center rounded-sm bg-[#1f282f]">
+              <span th:text="${series.name}">No image available</span>
+            </div>
+            <a th:href="@{/series/{slug}(slug=${series.slug})}" class="absolute top-0 left-0 w-full h-full rounded-sm border transition duration-150 hover:border-[#00e054] hover:inset-ring-3 hover:inset-ring-[#00e054] z-20"></a>
+          </li>
+        </ul>
       </div>
       <div class="flex flex-col divide-y divide-[#445566] gap-3 pt-5">
         <div class="flex flex-row py-1 justify-between items-end">
           <h1 class="font-light text-lg text-[#99aabb]">Just reviewed...</h1>
           <a th:href="@{/series/browse}" class="text-light text-sm text-[#667788] hover:text-[#40bcf4]">Browse</a>
         </div>
-        <div class="flex flex-row gap-3">
-          <section th:each="review : ${justReviewed}" class="flex flex-row gap-3">
-            <article>
-              <a th:href="@{/reviews/{reviewId}(reviewId=${review.id})}">
-                <img th:src="'https://artworks.thetvdb.com' + ${review.series.image}" class="object-contain rounded-sm border">
-              </a>
-            </article>
-          </section>
-        </div>
+        <ul class="grid grid-cols-4 lg:flex lg:flex-row gap-3">
+          <li th:each="review : ${justReviewed}" th:with="imgUrl=${@cloudinaryService.fetchPoster('https://artworks.thetvdb.com' + review.series.image, 'MD')}" class="relative flex flex-row gap-3">
+            <img th:if="${review.series.image != null}" th:src="${imgUrl}" class="object-contain rounded-sm border">
+            <div th:if="${review.series.image == null}" class="grid lg:w-[68px] lg:aspect-17/25 place-items-center text-center rounded-sm bg-[#1f282f]">
+              <span th:text="${review.series.name}">No image available</span>
+            </div>
+            <a th:href="@{/reviews/{reviewId}(reviewId=${review.id})}" class="absolute top-0 left-0 w-full h-full rounded-sm border transition duration-150 hover:border-[#00e054] hover:inset-ring-3 hover:inset-ring-[#00e054] z-20"></a>
+          </li>
+        </ul>
       </div>
     </div>
   </body>

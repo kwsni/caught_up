@@ -1,37 +1,40 @@
-<nav th:fragment="navbar" class="w-full py-4 px-2 mx-auto lg:w-[950px]  text-[#aabbcc]">
-    <ul class="flex flex-row w-full justify-between items-center gap-3">
-        <li><a th:href="@{/}" class="text-left text-2xl text-nowrap font-mono lg:text-4xl">Caught Up!</a></li>
-        <ul class="flex flex-row items-center gap-3 font-mono font-bold">
-            <ul class="flex flex-row items-center">
-                <li sec:authorize="isAuthenticated()" class="inline-block relative group/menu">
-                    <button class="flex flex-row items-center gap-2 cursor-pointer">
-                        <img th:src="${#authentication.principal.avatar}"
-                            class="rounded-full h-10"/>
-                        <span th:text="${#strings.toUpperCase(#authentication.principal.username)}" class="text-nowrap font-bold">
-                            Username
-                        </span>
-                    </button>
-                    <div id="menu" class="invisible absolute right-0 z-3 outline-1 divide-y outline-[#667788] divide-[#667788] font-sans font-normal group-focus-within/menu:visible group-hover/menu:visible">
-                        <a th:href="@{/members/{username}(username=${#authentication.principal.username})}"
-                            class="block bg-[#8899aa] text-[#2c3440] text-nowrap px-4 py-2 hover:bg-[#667788] hover:text-white active:bg-[#607080]">
-                            Profile
-                        </a>
-                        <a th:href="@{/members/{username}/reviews(username=${#authentication.principal.username})}"
-                            class="block bg-[#8899aa] text-[#2c3440] text-nowrap px-4 py-2 hover:bg-[#667788] hover:text-white active:bg-[#607080]">
-                            Reviews
-                        </a>
-                        <a th:href="@{/logout}"
-                            class="block bg-[#8899aa] text-[#2c3440] text-nowrap px-4 py-2 hover:bg-[#667788] hover:text-white active:bg-[#607080]">
-                            Log out
-                        </a>
-                    </div>
-                </li>
-                <li sec:authorize="isAnonymous()"><a th:href="@{/sign-in}" class="text-nowrap hover:text-white">SIGN IN</a></li>
+<nav th:fragment="navbar" class="inline-block relative group/menu">
+    <button class="flex flex-row items-center gap-2 cursor-pointer lg:invisible lg:absolute">
+        <svg width="40px" height="40px" viewBox="0 0 24 24" class="stroke-2 stroke-gray-600">
+            <path d="M4 18L20 18" stroke-linecap="round"></path>
+            <path d="M4 12L20 12" stroke-linecap="round"></path>
+            <path d="M4 6L20 6" stroke-linecap="round"></path>
+        </svg>
+    </button>
+    <ul id="menu" class="invisible absolute right-0 flex flex-col items-baseline max-lg:outline-1 max-lg:divide-y outline-[#667788] divide-[#667788] lg:font-mono lg:font-bold lg:visible lg:relative lg:flex-row lg:gap-3 lg:items-center group-focus-within/menu:visible group-hover/menu:visible group-focus-within/menu:z-50 group-hover/menu:z-50">
+        <li sec:authorize="isAuthenticated()" class="relative flex flex-col items-baseline lg:items-center group/profile-menu">
+            <button class="flex flex-row items-center w-full gap-2 max-lg:px-4 max-lg:py-2 cursor-pointer max-lg:bg-[#445566]">
+                <div class="size-6 bg-[#1f282f] rounded-full lg:size-10">
+                    <img th:if="${#authentication.principal.user.avatar != null}" th:with="imgUrl=${@cloudinaryService.transformAvatar(#authentication.principal.user.username, #authentication.principal.user.avatar, 'MD')}" th:src="${imgUrl}" class="rounded-full h-6 lg:h-10"/>
+                </div>
+                <span th:text="${#authentication.principal.user.username}" class="text-nowrap lg:font-bold lg:uppercase">
+                    Username
+                </span>
+            </button>
+            <ul id="profile-menu" class="w-full right-0 top-10 z-51 divide-y divide-[#667788] font-sans font-normal lg:hidden lg:absolute lg:outline-1 lg:outline-[#667788] group-focus-within/profile-menu:block group-hover/profile-menu:block">
+                <li class="w-full"><a th:href="@{/members/{username}(username=${#authentication.principal.user.username})}"
+                    class="block w-full bg-[#8899aa] text-[#2c3440] text-nowrap pl-8 pr-4 py-2 lg:px-4 hover:bg-[#667788] hover:text-white active:bg-[#607080]">
+                    Profile
+                </a></li>
+                <li class="w-full"><a th:href="@{/members/{username}/reviews(username=${#authentication.principal.user.username})}"
+                    class="block w-full bg-[#8899aa] text-[#2c3440] text-nowrap pl-8 pr-4 py-2 lg:px-4 hover:bg-[#667788] hover:text-white active:bg-[#607080]">
+                    Reviews
+                </a></li>
+                <li class="w-full"><a th:href="@{/logout}"
+                    class="block w-full bg-[#8899aa] text-[#2c3440] text-nowrap pl-8 pr-4 py-2 lg:px-4 hover:bg-[#667788] hover:text-white active:bg-[#607080]">
+                    Log out
+                </a></li>
             </ul>
-            <li><a th:href="@{/series}" class="hover:text-white">SERIES</a></li>
-            <li><a th:href="@{/reviews}" class="hover:text-white">REVIEWS</a></li>
-            <li><a th:href="@{/members}" class="hover:text-white">MEMBERS</a></li>
-            <li sec:authorize="isAuthenticated()"><a th:href="@{/post-review}" class="bg-[#00ac1c] hover:bg-[#009d1a] text-white align-center px-3 py-1 rounded-sm inset-shadow-2xs/30 inset-shadow-white">+ LOG</a></li>
-        </ul>
+        </li>
+        <li sec:authorize="isAnonymous()" class="w-full"><a th:href="@{/sign-in}" class="block w-full max-lg:bg-[#445566] text-nowrap lg:uppercase max-lg:px-4 max-lg:py-2 max-lg:hover:bg-[#667788] hover:text-white max-lg:active:bg-[#607080]">Sign in</a></li>
+        <li class="w-full"><a th:href="@{/series}" class="block w-full max-lg:bg-[#445566] text-nowrap lg:uppercase max-lg:px-4 max-lg:py-2 max-lg:hover:bg-[#667788] hover:text-white max-lg:active:bg-[#607080]">Series</a></li>
+        <li class="w-full"><a th:href="@{/reviews}" class="block w-full max-lg:bg-[#445566] text-nowrap lg:uppercase max-lg:px-4 max-lg:py-2 max-lg:hover:bg-[#667788] hover:text-white max-lg:active:bg-[#607080]">Reviews</a></li>
+        <li class="w-full"><a th:href="@{/members}" class="block w-full max-lg:bg-[#445566] text-nowrap lg:uppercase max-lg:px-4 max-lg:py-2 max-lg:hover:bg-[#667788] hover:text-white max-lg:active:bg-[#607080]">Members</a></li>
+        <li sec:authorize="isAuthenticated()" class="w-full"><a th:href="@{/reviews/new}" class="block w-full px-4 py-2 text-nowrap lg:uppercase bg-[#00ac1c] hover:bg-[#009d1a] text-white lg:align-center lg:px-3 lg:py-1 lg:rounded-sm lg:inset-shadow-2xs/30 lg:inset-shadow-white">+ Log</a></li>
     </ul>
 </nav>

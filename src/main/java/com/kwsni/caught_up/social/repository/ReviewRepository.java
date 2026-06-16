@@ -22,6 +22,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long>{
     Page<Review> findBySeries_SlugAndRating(String slug, Double rating, Pageable pageable);
     long countByAuthor_Username(String username);
     List<ReviewRatingDto> findBySeries_Slug(String slug);
+    Page<Review> findByRating(Double rating, Pageable pageable);
     @Query("SELECT AVG(review.rating) FROM Review review WHERE review.series.slug = ?1")
     Double avgRatingsBySeries_Slug(String slug);
 }

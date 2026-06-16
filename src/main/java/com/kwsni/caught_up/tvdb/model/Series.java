@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.hibernate.annotations.Formula;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kwsni.caught_up.social.model.Review;
 
 import jakarta.persistence.Column;
@@ -35,9 +37,11 @@ public class Series extends TvdbEntity<Long>{
     private String overview;
     
     @OneToMany(mappedBy = "series", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("series")
     private List<Episode> episodes;
 
     @OneToMany(mappedBy = "series", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Review> reviews;
     
     // Likely need to cache

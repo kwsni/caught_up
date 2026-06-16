@@ -4,6 +4,8 @@ import java.util.Set;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -53,15 +55,16 @@ public class Member {
     private Pronoun pronoun;
 
     @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("author")
     private Set<Review> reviews;
 
     @ManyToMany(mappedBy = "likes", fetch = FetchType.LAZY)
     private Set<Review> likedReviews;
 
-    @OneToMany(mappedBy = "follower", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "follower", fetch = FetchType.EAGER)
     private Set<MemberFollow> membersFollowed;
 
-    @OneToMany(mappedBy = "followed", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "followed", fetch = FetchType.EAGER)
     private Set<MemberFollow> followingMembers;
 
     protected Member() {}
@@ -72,6 +75,19 @@ public class Member {
         this.password = password;
         this.role = role;
         this.isGenerated = isGenerated;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Member u) {
+            return this.username.equals(u.getUsername());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.username.hashCode();
     }
     
     public long getId() {

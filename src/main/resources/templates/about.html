@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{base}">
+  <head>
+    <title>About Caught Up!</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+        <article class="mt-10">
+        <h1 class="mb-4 text-2xl font-semibold">About Caught Up!</h1>
+        <p class="mb-1">Caught Up! is a social website for reviewing TV series mimicking the style and layout of Letterboxd.com. This website is currently for demonstration purposes only. Most "user-generated" content is LLM generated for presentation. Visitors can create accounts and post content but are strongly advised not to use real personal or sensitive information.</p>
+        <p class="mb-2">Created by kwsni.</p>
+        <h2 class="mb-1 text-xl">Series data</h2>
+        <p class="mb-2">All series metadata including poster art is provided by <a href="https://www.thetvdb.com" class="hover:text-white">TheTVDB</a></p>
+        <img th:src="@{/images/tvdb_logo1.png}" class="mb-2 w-32 aspect-auto">
+        <h2 class="mb-1 text-xl">Contact</h2>
+        <p>To contact the owner of this website, send an email to <a href="mailto:blackbox.notif@gmail.com" class="hover:text-white">blackbox.notif@gmail.com</a></p>
+      </article>
+    </div>
+  </body>
+</html>
